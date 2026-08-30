@@ -79,6 +79,7 @@ def optimize_video():
     try:
         ffmpeg_bin = imageio_ffmpeg.get_ffmpeg_exe()
         
+        # Speed-Optimized FFmpeg Call
         (
             ffmpeg
             .input(input_path)
@@ -91,10 +92,9 @@ def optimize_video():
                 vf='scale=-2:720'
             )
             .overwrite_output()
-            .run(cmd=ffmpeg_bin)
+            .run(cmd=ffmpeg_bin, capture_stdout=True, capture_stderr=True)
         )
         
-        # Explicitly pass download_file to render the download UI
         return render_template('index.html', download_file=output_filename)
 
     except Exception as e:
