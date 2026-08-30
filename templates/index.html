@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MaxyEU OPTIMIZER</title>
-    <!-- Load FFmpeg WebAssembly for Local In-Browser Hardware Downscaling -->
+    
     <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mp4box@0.5.2/dist/mp4box.all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.0/build/mp4-muxer.min.js"></script>
+
     <style>
         * { box-sizing: border-box; }
         body {
@@ -44,21 +47,9 @@
             margin: 0 auto;
         }
 
-        .header-section {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-        .header-title {
-            font-size: 42px;
-            font-weight: 800;
-            margin: 0 0 8px 0;
-            letter-spacing: -0.5px;
-        }
-        .header-subtitle {
-            color: #a3a3bd;
-            font-size: 15px;
-            margin: 0;
-        }
+        .header-section { text-align: center; margin-bottom: 25px; }
+        .header-title { font-size: 42px; font-weight: 800; margin: 0 0 8px 0; letter-spacing: -0.5px; }
+        .header-subtitle { color: #a3a3bd; font-size: 15px; margin: 0; }
 
         .step-indicator-bar {
             display: flex;
@@ -119,12 +110,7 @@
             backdrop-filter: blur(10px);
         }
 
-        .section-header {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            margin-bottom: 20px;
-        }
+        .section-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
         .section-number {
             background: #b57edc;
             color: #000;
@@ -150,13 +136,9 @@
             cursor: pointer;
             transition: all 0.2s ease;
         }
-        .upload-dropzone:hover {
-            border-color: #b57edc;
-            background: rgba(181, 126, 220, 0.08);
-        }
+        .upload-dropzone:hover { border-color: #b57edc; background: rgba(181, 126, 220, 0.08); }
         .plus-icon {
-            width: 44px;
-            height: 44px;
+            width: 44px; height: 44px;
             background: #b57edc;
             color: #000;
             border-radius: 10px;
@@ -215,28 +197,12 @@
         .option-card input[type="checkbox"] {
             margin-top: 4px;
             accent-color: #b57edc;
-            width: 18px;
-            height: 18px;
+            width: 18px; height: 18px;
         }
         .option-content { flex: 1; }
         .option-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 10px; }
-        .recommended-badge {
-            background: #b57edc;
-            color: #000;
-            font-size: 10px;
-            font-weight: 800;
-            padding: 2px 8px;
-            border-radius: 4px;
-        }
-        .optional-badge {
-            background: rgba(181, 126, 220, 0.15);
-            color: #b57edc;
-            border: 1px solid #b57edc;
-            font-size: 10px;
-            font-weight: 800;
-            padding: 2px 8px;
-            border-radius: 4px;
-        }
+        .recommended-badge { background: #b57edc; color: #000; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 4px; }
+        .optional-badge { background: rgba(181, 126, 220, 0.15); color: #b57edc; border: 1px solid #b57edc; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 4px; }
         .option-desc { font-size: 13px; color: #928fa8; margin: 0; line-height: 1.4; }
 
         .submit-btn {
@@ -270,16 +236,14 @@
         }
         .progress-status { font-size: 13px; color: #b57edc; font-weight: 700; margin-bottom: 10px; }
         .progress-track {
-            width: 100%;
-            height: 12px;
+            width: 100%; height: 12px;
             background: #0a0810;
             border-radius: 6px;
             overflow: hidden;
             border: 1px solid #2d233e;
         }
         .progress-fill {
-            height: 100%;
-            width: 0%;
+            height: 100%; width: 0%;
             background: linear-gradient(90deg, #9f62c8, #b57edc);
             transition: width 0.3s ease;
         }
@@ -345,7 +309,7 @@
         .time-pill { background: rgba(181, 126, 220, 0.15); color: #d8b8f3; font-size: 11px; padding: 4px 10px; border-radius: 6px; display: inline-block; }
         .cancel-btn { background: transparent; border: none; color: #7d7894; font-size: 13px; cursor: pointer; margin-top: 10px; width: 100%; text-align: center; }
 
-        /* Local Spinner UI */
+        /* Spinner UI */
         .spinner-ring {
             width: 48px; height: 48px;
             border: 4px solid rgba(181, 126, 220, 0.15);
@@ -372,7 +336,6 @@
         <p class="header-subtitle">Choose a video, pick a method, and download the finished file.</p>
     </div>
 
-    <!-- Wizard Indicator Bar -->
     <div class="step-indicator-bar">
         <div class="step-node active" id="step-node-1">
             <div class="step-badge" id="step-badge-1">1</div>
@@ -468,7 +431,6 @@
             </button>
         </form>
 
-        <!-- Progress Tracker Bar -->
         <div class="progress-box" id="progress-box">
             <div class="progress-status" id="progress-status">Uploading Video... 0%</div>
             <div class="progress-track">
@@ -476,7 +438,6 @@
             </div>
         </div>
 
-        <!-- Download Container View -->
         {% if download_file %}
             <div class="download-card" id="download-section">
                 <h3 style="margin: 0; color: #b57edc;">Optimization Complete!</h3>
@@ -485,7 +446,6 @@
             </div>
         {% endif %}
 
-        <!-- Modal Window UI for Native Browser Hardware Downscaling -->
         <div id="downscale-modal" class="modal-overlay" style="display: none;">
             <div class="modal-content">
                 <div class="modal-subtitle">CHOOSE A DOWNSCALER</div>
@@ -497,13 +457,13 @@
                 <div class="downscale-option highlight" onclick="startLocalEncoding()">
                     <span class="badge-tag">BEST OPTION · NO UPLOAD · NO QUEUE</span>
                     <div class="option-header-title">Fast No Queue · Client Side Downscaler</div>
-                    <p class="option-subtext">Uses hardware-accelerated WebAssembly directly on this device. Your video never uploads to a processing server.</p>
+                    <p class="option-subtext">Uses hardware-accelerated WebAssembly / WebCodecs directly on this device. Your video never uploads to a processing server.</p>
                     <div class="time-pill">Live processing time will appear during rendering</div>
                 </div>
 
                 <div class="downscale-option" onclick="startLocalEncoding()">
                     <div class="option-header-title">Compatibility Client Side Downscaler</div>
-                    <p class="option-subtext">Runs locally using standard browser fallback routines.</p>
+                    <p class="option-subtext">Runs locally using standard browser canvas fallback routines.</p>
                     <div class="time-pill">Estimated time: 60 sec – 120 sec</div>
                 </div>
 
@@ -511,7 +471,6 @@
             </div>
         </div>
 
-        <!-- Local In-Browser Processing Container -->
         <div id="local-processing-view" style="display: none; text-align: center; padding: 40px 20px;">
             <div class="spinner-ring"></div>
             <div class="status-tag">PROCESSING LOCALLY</div>
@@ -524,7 +483,7 @@
             <div class="progress-percent" id="local-progress-percent" style="font-weight: 800; color: #b57edc; margin-top: 5px;">0%</div>
 
             <div style="margin-top: 15px;">
-                <span id="local-time-left" class="time-pill">Initializing WASM engine...</span>
+                <span id="local-time-left" class="time-pill">Initializing Hardware Pipeline...</span>
             </div>
         </div>
 
@@ -587,12 +546,40 @@
         }
     }
 
+    // Hybrid Engine Handler
     async function startLocalEncoding() {
         closeModal();
         
         document.getElementById('optimizer-form').style.display = 'none';
         document.getElementById('local-processing-view').style.display = 'block';
 
+        // 1. Try WebCodecs GPU acceleration
+        const supportsWebCodecs = typeof window.VideoEncoder === 'function' && typeof window.VideoDecoder === 'function';
+        if (supportsWebCodecs) {
+            try {
+                await runWebCodecsEncoding();
+                return;
+            } catch (err) {
+                console.warn("WebCodecs GPU pipeline bypassed. Switching to WASM CPU...", err);
+            }
+        }
+
+        // 2. Fallback to WebAssembly CPU
+        try {
+            await runWasmEncoding();
+            return;
+        } catch (err) {
+            console.warn("WebAssembly bypassed. Switching to Server Encoding...", err);
+        }
+
+        // 3. Final Fallback: Server-side encoding
+        document.getElementById('local-processing-view').style.display = 'none';
+        document.getElementById('optimizer-form').style.display = 'block';
+        document.getElementById('optimizer-form').submit();
+    }
+
+    // WebAssembly CPU Downscaler
+    async function runWasmEncoding() {
         const startTime = Date.now();
 
         if (!ffmpegWasm.isLoaded()) {
@@ -630,72 +617,115 @@
         const blob = new Blob([data.buffer], { type: 'video/mp4' });
         const downloadUrl = URL.createObjectURL(blob);
 
+        renderCompletionView(downloadUrl, "Processed entirely on this device using client-side CPU acceleration.");
+    }
+
+    // WebCodecs GPU Downscaler
+    async function runWebCodecsEncoding() {
+        document.getElementById('local-time-left').innerText = "Initializing GPU Engine...";
+
+        const fileBuffer = await selectedFile.arrayBuffer();
+        fileBuffer.fileStart = 0;
+
+        const muxer = new Mp4Muxer.Muxer({
+            target: new Mp4Muxer.ArrayBufferTarget(),
+            video: { codec: 'avc', width: 1920, height: 1080 },
+            fastStart: 'in-memory'
+        });
+
+        const encoder = new VideoEncoder({
+            output: (chunk, metadata) => muxer.addVideoChunk(chunk, metadata),
+            error: (e) => console.error("GPU Encoder error:", e)
+        });
+
+        await encoder.configure({
+            codec: 'avc1.4d4028',
+            width: 1920,
+            height: 1080,
+            bitrate: 8_000_000,
+            framerate: 60,
+            hardwareAcceleration: 'prefer-hardware'
+        });
+
+        const canvas = document.createElement('canvas');
+        canvas.width = 1920;
+        canvas.height = 1080;
+        const ctx = canvas.getContext('2d');
+
+        let frameIndex = 0;
+        let processedFrames = 0;
+
+        const decoder = new VideoDecoder({
+            output: async (frame) => {
+                ctx.drawImage(frame, 0, 0, 1920, 1080);
+                const scaledFrame = new VideoFrame(canvas, {
+                    timestamp: frame.timestamp,
+                    duration: frame.duration
+                });
+
+                const keyFrame = (frameIndex % 60 === 0);
+                encoder.encode(scaledFrame, { keyFrame: keyFrame });
+                
+                scaledFrame.close();
+                frame.close();
+                frameIndex++;
+
+                processedFrames++;
+                const progress = Math.min(Math.round((processedFrames / 1800) * 100), 99);
+                document.getElementById('local-progress-fill').style.width = progress + '%';
+                document.getElementById('local-progress-percent').innerText = progress + '%';
+                document.getElementById('local-time-left').innerText = "Encoding via GPU WebCodecs Pipeline...";
+            },
+            error: (e) => console.error("GPU Decoder error:", e)
+        });
+
+        const mp4boxfile = MP4Box.createFile();
+        mp4boxfile.onReady = function (info) {
+            const videoTrack = info.videoTracks[0];
+            decoder.configure({
+                codec: videoTrack.codec,
+                codedWidth: videoTrack.video_dimensions.width,
+                codedHeight: videoTrack.video_dimensions.height,
+                description: mp4boxfile.getTrackById(videoTrack.id).description
+            });
+            mp4boxfile.setExtractionOptions(videoTrack.id, null, { nbSamples: 100 });
+            mp4boxfile.start();
+        };
+
+        mp4boxfile.onSamples = function (track_id, ref, samples) {
+            for (let sample of samples) {
+                const chunk = new EncodedVideoChunk({
+                    type: sample.is_sync ? 'key' : 'delta',
+                    timestamp: (sample.cts * 1000000) / sample.timescale,
+                    duration: (sample.duration * 1000000) / sample.timescale,
+                    data: sample.data
+                });
+                decoder.decode(chunk);
+            }
+        };
+
+        mp4boxfile.appendBuffer(fileBuffer);
+        mp4boxfile.flush();
+
+        await decoder.flush();
+        await encoder.flush();
+        muxer.finalize();
+
+        const { buffer } = muxer.target;
+        const blob = new Blob([buffer], { type: 'video/mp4' });
+        const downloadUrl = URL.createObjectURL(blob);
+
+        renderCompletionView(downloadUrl, "Processed instantly via GPU WebCodecs hardware engine.");
+    }
+
+    function renderCompletionView(downloadUrl, messageText) {
         document.getElementById('local-processing-view').innerHTML = `
-            <div style="font-size: 50px;">✓</div>
+            <div style="font-size: 50px;">⚡</div>
             <div class="status-tag" style="margin-top: 10px;">RENDER COMPLETE</div>
             <h2 class="render-title">Your video is ready</h2>
-            <p class="render-sub">Processed entirely on this device using client-side WebAssembly.</p>
+            <p class="render-sub">${messageText}</p>
             <a class="download-btn" href="${downloadUrl}" download="optimized_${selectedFile.name}">Download Video</a>
         `;
 
         document.getElementById('step-node-3').classList.add('active');
-        document.getElementById('step-badge-2').innerText = '✓';
-    }
-
-    const form = document.getElementById('optimizer-form');
-    form.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const fileInput = document.getElementById('video-input');
-        if (!fileInput.files.length) return;
-
-        const formData = new FormData(form);
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', '/optimize', true);
-
-        const progressBox = document.getElementById('progress-box');
-        const progressFill = document.getElementById('progress-fill');
-        const progressStatus = document.getElementById('progress-status');
-        const submitBtn = document.getElementById('submit-btn');
-
-        xhr.upload.onprogress = function(e) {
-            if (e.lengthComputable) {
-                const percent = Math.round((e.loaded / e.total) * 90);
-                progressFill.style.width = percent + '%';
-                progressStatus.innerText = 'Uploading Video... ' + percent + '%';
-            }
-        };
-
-        xhr.upload.onload = function() {
-            progressFill.style.width = '95%';
-            progressStatus.innerText = 'Encoding & Optimizing Video... Please Wait';
-        };
-
-        xhr.onload = function() {
-            if (xhr.status === 200) {
-                progressFill.style.width = '100%';
-                progressStatus.innerText = 'Processing Complete!';
-                
-                document.open();
-                document.write(xhr.responseText);
-                document.close();
-            } else {
-                alert('Optimization failed. Please try again.');
-                submitBtn.disabled = false;
-            }
-        };
-
-        progressBox.style.display = 'block';
-        submitBtn.disabled = true;
-        xhr.send(formData);
-    });
-
-    {% if download_file %}
-        document.getElementById('step-node-2').classList.add('active');
-        document.getElementById('step-node-3').classList.add('active');
-        document.getElementById('step-badge-1').innerText = '✓';
-        document.getElementById('step-badge-2').innerText = '✓';
-    {% endif %}
-</script>
-</body>
-</html>
+        document.getElementById('step-badge-2').innerText
