@@ -8,7 +8,8 @@
         * { box-sizing: border-box; }
         body {
             font-family: Arial, sans-serif;
-            background: linear-gradient(rgba(8, 8, 12, 0.85), rgba(8, 8, 12, 0.85)), url("{{ url_for('static', filename='bg.jpg') }}") no-repeat center center fixed;
+            /* Lightened dark overlay from 0.85 to 0.35 opacity so bg.jpg is clearly visible */
+            background: linear-gradient(rgba(8, 8, 12, 0.35), rgba(8, 8, 12, 0.35)), url("{{ url_for('static', filename='bg.jpg') }}") no-repeat center center fixed;
             background-size: cover;
             color: #ffffff;
             display: flex;
@@ -18,7 +19,7 @@
             margin: 0;
         }
         .container {
-            background-color: rgba(26, 26, 36, 0.95);
+            background-color: rgba(26, 26, 36, 0.92);
             padding: 35px;
             border-radius: 12px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
@@ -34,7 +35,7 @@
             border: 2px dashed #00f2fe;
             border-radius: 8px;
             padding: 30px;
-            background: rgba(17, 17, 24, 0.8);
+            background: rgba(17, 17, 24, 0.85);
             cursor: pointer;
             margin-bottom: 20px;
             transition: border-color 0.3s ease;
@@ -56,7 +57,6 @@
             width: 100%;
         }
 
-        /* Progress Bar Styling */
         .progress-container {
             display: none;
             margin-top: 20px;
@@ -145,7 +145,6 @@
             <button type="submit" class="submit-btn" id="submit-btn">OPTIMIZE VIDEO</button>
         </form>
 
-        <!-- Dynamic Progress Bar -->
         <div class="progress-container" id="progress-container">
             <div class="progress-title" id="progress-status">Uploading Video... 0%</div>
             <div class="progress-bar-bg">
@@ -186,22 +185,19 @@
             const xhr = new XMLHttpRequest();
             xhr.open('POST', '/optimize', true);
 
-            // Track upload progress
             xhr.upload.onprogress = function(e) {
                 if (e.lengthComputable) {
-                    const percent = Math.round((e.loaded / e.total) * 90); // Scale upload to 90%
+                    const percent = Math.round((e.loaded / e.total) * 90);
                     progressBarFill.style.width = percent + '%';
                     progressStatus.innerText = 'Uploading Video... ' + percent + '%';
                 }
             };
 
-            // Switch text when file is fully uploaded and FFmpeg starts encoding
             xhr.upload.onload = function() {
                 progressBarFill.style.width = '95%';
                 progressStatus.innerText = 'Encoding & Optimizing Video... Please Wait';
             };
 
-            // Handle server completion response
             xhr.onload = function() {
                 if (xhr.status === 200) {
                     progressBarFill.style.width = '100%';
