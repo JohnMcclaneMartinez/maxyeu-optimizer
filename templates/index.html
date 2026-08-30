@@ -3,110 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MAXYEU Video Optimizer</title>
+    <title>MaxyEU OPTIMIZER</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-
+        * { box-sizing: border-box; }
         body {
-            background: #121212;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(rgba(8, 8, 12, 0.85), rgba(8, 8, 12, 0.85)), url("{{ url_for('static', filename='bg.jpg') }}") no-repeat center center fixed;
+            background-size: cover;
             color: #ffffff;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            padding: 20px;
+            margin: 0;
         }
-
         .container {
-            background: #1e1e1e;
-            padding: 30px;
+            background-color: rgba(26, 26, 36, 0.95);
+            padding: 35px;
             border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-            width: 100%;
-            max-width: 480px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+            width: 480px;
+            max-width: 90vw;
             text-align: center;
+            border: 1px solid #333;
         }
-
-        h1 {
-            font-size: 1.8rem;
-            margin-bottom: 20px;
-            color: #00e676;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        input[type="file"] {
-            background: #2a2a2a;
-            color: #eee;
-            padding: 12px;
+        h1 { font-size: 22px; color: #ff0050; margin-bottom: 5px; text-shadow: 0 0 10px rgba(255, 0, 80, 0.3); }
+        h2 { font-size: 13px; color: #00f2fe; margin-top: 0; margin-bottom: 25px; letter-spacing: 1px; }
+        
+        .upload-area {
+            border: 2px dashed #00f2fe;
             border-radius: 8px;
-            border: 1px solid #444;
-            font-size: 0.95rem;
-            width: 100%;
-        }
-
-        button {
-            background: #00e676;
-            color: #121212;
-            border: none;
-            padding: 14px;
-            font-size: 1rem;
-            font-weight: bold;
-            border-radius: 8px;
+            padding: 30px;
+            background: rgba(17, 17, 24, 0.8);
             cursor: pointer;
-            transition: background 0.2s ease;
+            margin-bottom: 20px;
+            transition: border-color 0.3s ease;
         }
+        .upload-area:hover { border-color: #ff0050; }
+        .upload-icon { font-size: 40px; margin-bottom: 10px; }
+        .upload-text { font-size: 14px; color: #ccc; word-break: break-all; }
+        #video-input { display: none; }
 
-        button:hover {
-            background: #00c853;
-        }
-
-        .flash-messages {
-            margin-bottom: 15px;
-            list-style: none;
-        }
-
-        .flash-messages li {
-            background: #ff5252;
+        .submit-btn {
+            background: linear-gradient(45deg, #ff0050, #00f2fe);
+            border: none;
             color: white;
-            padding: 10px;
+            padding: 14px;
+            font-weight: bold;
+            font-size: 15px;
             border-radius: 6px;
-            font-size: 0.9rem;
+            cursor: pointer;
+            width: 100%;
         }
 
         .download-box {
             margin-top: 25px;
             padding: 15px;
-            background: #2a2a2a;
+            background: rgba(17, 17, 24, 0.9);
             border-radius: 8px;
-            border: 1px dashed #00e676;
+            border: 1px dashed #00f2fe;
         }
 
         .download-btn {
             display: inline-block;
             margin-top: 10px;
-            padding: 10px 20px;
-            background: #00e676;
-            color: #121212;
+            padding: 12px 20px;
+            background: linear-gradient(45deg, #00f2fe, #ff0050);
+            color: white;
             text-decoration: none;
             font-weight: bold;
             border-radius: 6px;
         }
+
+        .flash-messages {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 15px;
+        }
+
+        .flash-messages li {
+            background: rgba(255, 0, 80, 0.2);
+            border: 1px solid #ff0050;
+            color: #ff0050;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
     </style>
 </head>
 <body>
-
     <div class="container">
-        <h1>MAXYEU Video Optimizer</h1>
+        <h1>MaxyEU OPTIMIZER</h1>
+        <h2>HIGH QUALITY GAMING & VIDEO ENCODER</h2>
 
         {% with messages = get_flashed_messages() %}
           {% if messages %}
@@ -119,17 +107,28 @@
         {% endwith %}
 
         <form action="/optimize" method="POST" enctype="multipart/form-data">
-            <input type="file" name="video" accept="video/*" required>
-            <button type="submit">Optimize Video</button>
+            <div class="upload-area" onclick="document.getElementById('video-input').click()">
+                <div class="upload-icon">📁</div>
+                <div class="upload-text" id="file-label">Click or Drag Video Here</div>
+            </div>
+            <input type="file" name="video" id="video-input" accept="video/*" onchange="updateLabel(this)" required>
+            <button type="submit" class="submit-btn">OPTIMIZE VIDEO</button>
         </form>
 
         {% if download_file %}
             <div class="download-box">
-                <p>Optimization Complete!</p>
-                <a class="download-btn" href="{{ url_for('download_file', filename=download_file) }}">Download Processed Video</a>
+                <p style="color: #00f2fe; font-size: 14px; font-weight: bold;">Optimization Complete!</p>
+                <a class="download-btn" href="{{ url_for('download_file', filename=download_file) }}">DOWNLOAD OPTIMIZED VIDEO</a>
             </div>
         {% endif %}
     </div>
 
+    <script>
+        function updateLabel(input) {
+            if (input.files && input.files[0]) {
+                document.getElementById('file-label').innerText = input.files[0].name;
+            }
+        }
+    </script>
 </body>
 </html>
