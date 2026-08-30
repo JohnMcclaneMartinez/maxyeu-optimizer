@@ -55,6 +55,7 @@ def optimize_video():
 
     file = request.files['video']
     method = request.form.get('method', 'max_quality')
+    optimize_tiktok = request.form.get('optimize_tiktok') == 'yes'
 
     if file.filename == '':
         flash('No file selected.')
@@ -69,7 +70,7 @@ def optimize_video():
     try:
         ffmpeg_bin = imageio_ffmpeg.get_ffmpeg_exe()
         
-        # Method-based encoder parameter routing
+        # Base encoder parameter routing
         if method == '720p60':
             crf_val = 22
             scale_filter = 'scale=-2:720'
@@ -83,17 +84,27 @@ def optimize_video():
             scale_filter = 'scale=-2:1080'
             preset_val = 'superfast'
 
+        # FFmpeg options dictionary
+        output_args = {
+            'vcodec': 'libx264',
+            'preset': preset_val,
+            'crf': crf_val,
+            'vf': scale_filter,
+            'pix_fmt': 'yuv420p',
+            'acodec': 'aac',
+            'b:a': '192k'
+        }
+
+        # Apply TikTok optimizations if requested
+        if optimize_tiktok:
+            output_args['maxrate'] = '8M'
+            output_args['bufsize'] = '16M'
+            output_args['crf'] = max(crf_val, 23)  # Slightly higher CRF for reduced file size
+
         (
             ffmpeg
             .input(input_path)
-            .output(
-                output_path,
-                vcodec='libx264',
-                preset=preset_val,
-                crf=crf_val,
-                vf=scale_filter,
-                pix_fmt='yuv420p'
-            )
+            .output(output_path, **output_args)
             .overwrite_output()
             .run(cmd=ffmpeg_bin, capture_stdout=True, capture_stderr=True)
         )
