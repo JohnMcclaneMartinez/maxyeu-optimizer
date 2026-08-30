@@ -60,7 +60,9 @@ def index():
     return render_template('index.html')
 
 
+# Handles both /optimize and /upload paths from HTML forms
 @app.route('/optimize', methods=['POST'])
+@app.route('/upload', methods=['POST'])
 def optimize_video():
     if 'video' not in request.files:
         flash('No file uploaded.')
