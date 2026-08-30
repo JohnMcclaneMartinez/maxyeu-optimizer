@@ -70,7 +70,7 @@ def optimize_video():
     try:
         ffmpeg_bin = imageio_ffmpeg.get_ffmpeg_exe()
         
-        # Base encoder parameter routing
+        # Encoder presets routing
         if method == '720p60':
             crf_val = 22
             scale_filter = 'scale=-2:720'
@@ -84,7 +84,7 @@ def optimize_video():
             scale_filter = 'scale=-2:1080'
             preset_val = 'superfast'
 
-        # FFmpeg options dictionary
+        # FFmpeg options
         output_args = {
             'vcodec': 'libx264',
             'preset': preset_val,
@@ -95,7 +95,7 @@ def optimize_video():
             'b:a': '192k'
         }
 
-        # Apply TikTok optimizations if requested
+        # Apply TikTok Bitrate Limits
         if optimize_tiktok:
             output_args['maxrate'] = '8M'
             output_args['bufsize'] = '16M'
