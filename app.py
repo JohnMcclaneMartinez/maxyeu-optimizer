@@ -5,7 +5,7 @@ from flask import Flask, render_template, request, send_from_directory, flash, r
 import ffmpeg
 import imageio_ffmpeg
 
-# Register bundled static FFmpeg binary
+# Register bundled static FFmpeg binary path
 os.environ["PATH"] += os.pathsep + os.path.dirname(imageio_ffmpeg.get_ffmpeg_exe())
 
 app = Flask(__name__)
@@ -79,7 +79,6 @@ def optimize_video():
     try:
         ffmpeg_bin = imageio_ffmpeg.get_ffmpeg_exe()
         
-        # High-speed encoding parameters for Render CPU constraints
         (
             ffmpeg
             .input(input_path)
@@ -94,11 +93,13 @@ def optimize_video():
             .overwrite_output()
             .run(cmd=ffmpeg_bin)
         )
+        
+        # Explicitly pass download_file to render the download UI
         return render_template('index.html', download_file=output_filename)
 
     except Exception as e:
         print(f"Optimization Error: {e}")
-        flash('Video optimization failed. Please check file format and try again.')
+        flash('Video optimization failed. Please try again.')
         return redirect(url_for('index'))
 
 
