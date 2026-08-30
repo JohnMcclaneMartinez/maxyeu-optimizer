@@ -56,6 +56,36 @@
             width: 100%;
         }
 
+        /* Progress Bar Styling */
+        .progress-container {
+            display: none;
+            margin-top: 20px;
+            background: rgba(17, 17, 24, 0.9);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #333;
+        }
+        .progress-title {
+            font-size: 13px;
+            color: #00f2fe;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        .progress-bar-bg {
+            width: 100%;
+            height: 18px;
+            background-color: #111118;
+            border-radius: 9px;
+            overflow: hidden;
+            border: 1px solid #00f2fe;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff0050, #00f2fe);
+            transition: width 0.3s ease;
+        }
+
         .download-box {
             margin-top: 25px;
             padding: 15px;
@@ -106,14 +136,22 @@
           {% endif %}
         {% endwith %}
 
-        <form action="/optimize" method="POST" enctype="multipart/form-data">
+        <form id="upload-form" action="/optimize" method="POST" enctype="multipart/form-data">
             <div class="upload-area" onclick="document.getElementById('video-input').click()">
                 <div class="upload-icon">📁</div>
                 <div class="upload-text" id="file-label">Click or Drag Video Here</div>
             </div>
             <input type="file" name="video" id="video-input" accept="video/*" onchange="updateLabel(this)" required>
-            <button type="submit" class="submit-btn">OPTIMIZE VIDEO</button>
+            <button type="submit" class="submit-btn" id="submit-btn">OPTIMIZE VIDEO</button>
         </form>
+
+        <!-- Dynamic Progress Bar -->
+        <div class="progress-container" id="progress-container">
+            <div class="progress-title" id="progress-status">Uploading Video... 0%</div>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progress-bar-fill"></div>
+            </div>
+        </div>
 
         {% if download_file %}
             <div class="download-box">
@@ -129,6 +167,58 @@
                 document.getElementById('file-label').innerText = input.files[0].name;
             }
         }
+
+        const uploadForm = document.getElementById('upload-form');
+        const fileInput = document.getElementById('video-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const progressContainer = document.getElementById('progress-container');
+        const progressBarFill = document.getElementById('progress-bar-fill');
+        const progressStatus = document.getElementById('progress-status');
+
+        uploadForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            if (!fileInput.files.length) return;
+
+            const formData = new FormData();
+            formData.append('video', fileInput.files[0]);
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/optimize', true);
+
+            // Track upload progress
+            xhr.upload.onprogress = function(e) {
+                if (e.lengthComputable) {
+                    const percent = Math.round((e.loaded / e.total) * 90); // Scale upload to 90%
+                    progressBarFill.style.width = percent + '%';
+                    progressStatus.innerText = 'Uploading Video... ' + percent + '%';
+                }
+            };
+
+            // Switch text when file is fully uploaded and FFmpeg starts encoding
+            xhr.upload.onload = function() {
+                progressBarFill.style.width = '95%';
+                progressStatus.innerText = 'Encoding & Optimizing Video... Please Wait';
+            };
+
+            // Handle server completion response
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    progressBarFill.style.width = '100%';
+                    progressStatus.innerText = 'Complete!';
+                    document.open();
+                    document.write(xhr.responseText);
+                    document.close();
+                } else {
+                    alert('Optimization failed. Please try again.');
+                    submitBtn.disabled = false;
+                }
+            };
+
+            progressContainer.style.display = 'block';
+            submitBtn.disabled = true;
+            xhr.send(formData);
+        });
     </script>
 </body>
 </html>
