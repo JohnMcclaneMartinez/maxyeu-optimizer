@@ -3,10 +3,10 @@ import time
 import threading
 from flask import Flask, render_template, request, send_from_directory, flash, redirect, url_for
 import ffmpeg
-import static_ffmpeg
+import imageio_ffmpeg
 
-# Initialize static-ffmpeg to install/load FFmpeg binaries automatically on Render
-static_ffmpeg.add_paths()
+# Set the path to the bundled ffmpeg binary
+os.environ["PATH"] += os.pathsep + os.path.dirname(imageio_ffmpeg.get_ffmpeg_exe())
 
 app = Flask(__name__)
 app.secret_key = "maxyeu_secret_key"
@@ -26,7 +26,6 @@ app.config['OUTPUT_FOLDER'] = OUTPUT_FOLDER
 # 1. Background Cleanup (Deletes > 2 Hours)
 # ==========================================
 def cleanup_old_files():
-    """Checks every 15 minutes and deletes files older than 2 hours (7,200 seconds)."""
     two_hours_in_seconds = 2 * 3600
 
     while True:
@@ -44,10 +43,8 @@ def cleanup_old_files():
                             except Exception as e:
                                 print(f"Error deleting {file_path}: {e}")
         
-        # Check every 15 minutes (900 seconds) for prompt cleanup
         time.sleep(900)
 
-# Start background cleanup thread automatically
 cleanup_thread = threading.Thread(target=cleanup_old_files, daemon=True)
 cleanup_thread.start()
 
@@ -60,7 +57,6 @@ def index():
     return render_template('index.html')
 
 
-# Handles both /optimize and /upload paths from HTML forms
 @app.route('/optimize', methods=['POST'])
 @app.route('/upload', methods=['POST'])
 def optimize_video():
@@ -73,7 +69,6 @@ def optimize_video():
         flash('No file selected.')
         return redirect(url_for('index'))
 
-    # Save incoming upload
     input_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
     output_filename = f"optimized_{file.filename}"
     output_path = os.path.join(app.config['OUTPUT_FOLDER'], output_filename)
@@ -81,7 +76,7 @@ def optimize_video():
     file.save(input_path)
 
     try:
-        # Fast, low-RAM compression for Render's free tier
+        ffmpeg_bin = imageio_ffmpeg.get_ffmpeg_exe()
         (
             ffmpeg
             .input(input_path)
@@ -93,7 +88,7 @@ def optimize_video():
                 vf='scale=-2:720'
             )
             .overwrite_output()
-            .run()
+            .run(cmd=ffmpeg_bin)
         )
         return render_template('index.html', download_file=output_filename)
 
