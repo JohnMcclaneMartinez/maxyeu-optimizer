@@ -5,7 +5,7 @@ from flask import Flask, render_template, request, send_from_directory, flash, r
 import ffmpeg
 import imageio_ffmpeg
 
-# Set the path to the bundled ffmpeg binary
+# Register bundled static FFmpeg binary
 os.environ["PATH"] += os.pathsep + os.path.dirname(imageio_ffmpeg.get_ffmpeg_exe())
 
 app = Flask(__name__)
@@ -26,6 +26,7 @@ app.config['OUTPUT_FOLDER'] = OUTPUT_FOLDER
 # 1. Background Cleanup (Deletes > 2 Hours)
 # ==========================================
 def cleanup_old_files():
+    """Checks every 15 minutes and removes files older than 2 hours."""
     two_hours_in_seconds = 2 * 3600
 
     while True:
@@ -77,6 +78,8 @@ def optimize_video():
 
     try:
         ffmpeg_bin = imageio_ffmpeg.get_ffmpeg_exe()
+        
+        # High-speed encoding parameters for Render CPU constraints
         (
             ffmpeg
             .input(input_path)
@@ -84,7 +87,8 @@ def optimize_video():
                 output_path,
                 vcodec='libx264',
                 preset='ultrafast',
-                crf=28,
+                tune='fastdecode',
+                crf=26,
                 vf='scale=-2:720'
             )
             .overwrite_output()
@@ -94,7 +98,7 @@ def optimize_video():
 
     except Exception as e:
         print(f"Optimization Error: {e}")
-        flash('Video optimization failed. Please ensure the file format is supported.')
+        flash('Video optimization failed. Please check file format and try again.')
         return redirect(url_for('index'))
 
 
