@@ -5,7 +5,6 @@ from flask import Flask, render_template, request, send_from_directory, flash, r
 import ffmpeg
 import imageio_ffmpeg
 
-# Register bundled static FFmpeg binary path
 os.environ["PATH"] += os.pathsep + os.path.dirname(imageio_ffmpeg.get_ffmpeg_exe())
 
 app = Flask(__name__)
@@ -70,7 +69,6 @@ def optimize_video():
     try:
         ffmpeg_bin = imageio_ffmpeg.get_ffmpeg_exe()
         
-        # Encoder presets routing
         if method == '720p60':
             crf_val = 22
             scale_filter = 'scale=-2:720'
@@ -79,12 +77,11 @@ def optimize_video():
             crf_val = 21
             scale_filter = 'scale=-2:1080'
             preset_val = 'ultrafast'
-        else:  # max_quality
+        else:
             crf_val = 19
             scale_filter = 'scale=-2:1080'
             preset_val = 'superfast'
 
-        # FFmpeg options
         output_args = {
             'vcodec': 'libx264',
             'preset': preset_val,
@@ -95,7 +92,6 @@ def optimize_video():
             'b:a': '192k'
         }
 
-        # Apply TikTok Bitrate Limits
         if optimize_tiktok:
             output_args['maxrate'] = '8M'
             output_args['bufsize'] = '16M'
