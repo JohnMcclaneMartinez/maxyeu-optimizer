@@ -11,7 +11,6 @@ os.environ["PATH"] += os.pathsep + os.path.dirname(imageio_ffmpeg.get_ffmpeg_exe
 app = Flask(__name__)
 app.secret_key = "maxyeu_secret_key"
 
-# Configuration paths
 UPLOAD_FOLDER = os.path.join(app.root_path, 'uploads')
 OUTPUT_FOLDER = os.path.join(app.root_path, 'outputs')
 
@@ -22,13 +21,8 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['OUTPUT_FOLDER'] = OUTPUT_FOLDER
 
 
-# ==========================================
-# 1. Background Cleanup (Deletes > 2 Hours)
-# ==========================================
 def cleanup_old_files():
-    """Checks every 15 minutes and removes files older than 2 hours."""
     two_hours_in_seconds = 2 * 3600
-
     while True:
         now = time.time()
         for folder in [UPLOAD_FOLDER, OUTPUT_FOLDER]:
@@ -36,23 +30,17 @@ def cleanup_old_files():
                 for file_name in os.listdir(folder):
                     file_path = os.path.join(folder, file_name)
                     if os.path.isfile(file_path):
-                        file_age = now - os.path.getmtime(file_path)
-                        if file_age > two_hours_in_seconds:
+                        if (now - os.path.getmtime(file_path)) > two_hours_in_seconds:
                             try:
                                 os.remove(file_path)
-                                print(f"Deleted old file: {file_path}")
                             except Exception as e:
                                 print(f"Error deleting {file_path}: {e}")
-        
         time.sleep(900)
 
 cleanup_thread = threading.Thread(target=cleanup_old_files, daemon=True)
 cleanup_thread.start()
 
 
-# ==========================================
-# 2. Flask Web Routes
-# ==========================================
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -66,6 +54,8 @@ def optimize_video():
         return redirect(url_for('index'))
 
     file = request.files['video']
+    method = request.form.get('method', 'max_quality')
+
     if file.filename == '':
         flash('No file selected.')
         return redirect(url_for('index'))
@@ -79,17 +69,30 @@ def optimize_video():
     try:
         ffmpeg_bin = imageio_ffmpeg.get_ffmpeg_exe()
         
-        # High-Quality & Clear Encoding Parameters
+        # Method-based encoder parameter routing
+        if method == '720p60':
+            crf_val = 22
+            scale_filter = 'scale=-2:720'
+            preset_val = 'ultrafast'
+        elif method == 'fps_patch':
+            crf_val = 21
+            scale_filter = 'scale=-2:1080'
+            preset_val = 'ultrafast'
+        else:  # max_quality
+            crf_val = 19
+            scale_filter = 'scale=-2:1080'
+            preset_val = 'superfast'
+
         (
             ffmpeg
             .input(input_path)
             .output(
                 output_path,
                 vcodec='libx264',
-                preset='superfast', # Upgraded from ultrafast to retain sharp details
-                crf=20,             # Lower CRF eliminates heavy pixelation/grain
-                vf='scale=-2:1080', # Maintains crisp 1080p resolution
-                pix_fmt='yuv420p'   # Ensures full mobile video player compatibility
+                preset=preset_val,
+                crf=crf_val,
+                vf=scale_filter,
+                pix_fmt='yuv420p'
             )
             .overwrite_output()
             .run(cmd=ffmpeg_bin, capture_stdout=True, capture_stderr=True)
@@ -99,7 +102,7 @@ def optimize_video():
 
     except Exception as e:
         print(f"Optimization Error: {e}")
-        flash('Video optimization failed. Please try again.')
+        flash('Video optimization failed.')
         return redirect(url_for('index'))
 
 
