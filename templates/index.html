@@ -8,15 +8,35 @@
         * { box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(rgba(10, 10, 12, 0.75), rgba(10, 10, 12, 0.75)), url("{{ url_for('static', filename='bg.jpg') }}") no-repeat center center fixed;
+            background: linear-gradient(rgba(10, 8, 15, 0.75), rgba(10, 8, 15, 0.75)), url("{{ url_for('static', filename='bg.jpg') }}") no-repeat center center fixed;
             background-size: cover;
             color: #ffffff;
             margin: 0;
-            padding: 40px 20px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
+            padding: 20px 20px 50px 20px;
             min-height: 100vh;
+        }
+
+        /* Top Brand Header Bar */
+        .top-navbar {
+            max-width: 1000px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+        }
+        .brand-logo {
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            color: #ffffff;
+            text-shadow: 0 0 12px rgba(181, 126, 220, 0.6);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .brand-logo span {
+            color: #b57edc;
         }
 
         .main-container {
@@ -37,7 +57,7 @@
             letter-spacing: -0.5px;
         }
         .header-subtitle {
-            color: #9999a1;
+            color: #a3a3bd;
             font-size: 15px;
             margin: 0;
         }
@@ -58,17 +78,17 @@
             left: 40px;
             right: 40px;
             height: 1px;
-            background: #2a2a35;
+            background: #2b263a;
             z-index: 1;
         }
         .step-node {
             display: flex;
             align-items: center;
             gap: 10px;
-            background: #0f0f14;
+            background: #110e1a;
             padding: 0 10px;
             z-index: 2;
-            color: #777782;
+            color: #7b7891;
             font-size: 14px;
             font-weight: 600;
         }
@@ -77,28 +97,29 @@
             width: 28px;
             height: 28px;
             border-radius: 50%;
-            background: #1c1c24;
-            color: #888894;
+            background: #1f1a2b;
+            color: #88829b;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 13px;
             font-weight: bold;
-            border: 1px solid #333342;
+            border: 1px solid #3b334d;
         }
         .step-node.active .step-badge {
-            background: #ffc83b;
+            background: #b57edc;
             color: #000000;
-            border-color: #ffc83b;
+            border-color: #b57edc;
+            box-shadow: 0 0 10px rgba(181, 126, 220, 0.4);
         }
 
         /* Outer Card Body */
         .content-card {
-            background: rgba(18, 18, 24, 0.92);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(18, 15, 26, 0.92);
+            border: 1px solid rgba(181, 126, 220, 0.18);
             border-radius: 16px;
             padding: 32px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(10px);
         }
 
@@ -109,7 +130,7 @@
             margin-bottom: 20px;
         }
         .section-number {
-            background: #ffc83b;
+            background: #b57edc;
             color: #000;
             width: 32px;
             height: 32px;
@@ -119,6 +140,7 @@
             justify-content: center;
             font-weight: 800;
             font-size: 16px;
+            box-shadow: 0 0 8px rgba(181, 126, 220, 0.4);
         }
         .section-title {
             font-size: 20px;
@@ -127,28 +149,28 @@
         }
         .section-desc {
             font-size: 13px;
-            color: #8a8a98;
+            color: #928fa8;
             margin: 2px 0 0 0;
         }
 
         /* File Select Drop Area */
         .upload-dropzone {
-            border: 1px dashed rgba(255, 200, 59, 0.4);
+            border: 1px dashed rgba(181, 126, 220, 0.5);
             border-radius: 12px;
             padding: 45px 20px;
             text-align: center;
-            background: rgba(25, 25, 35, 0.5);
+            background: rgba(28, 22, 40, 0.4);
             cursor: pointer;
             transition: all 0.2s ease;
         }
         .upload-dropzone:hover {
-            border-color: #ffc83b;
-            background: rgba(255, 200, 59, 0.04);
+            border-color: #b57edc;
+            background: rgba(181, 126, 220, 0.08);
         }
         .plus-icon {
             width: 44px;
             height: 44px;
-            background: #ffc83b;
+            background: #b57edc;
             color: #000;
             border-radius: 10px;
             display: flex;
@@ -157,6 +179,7 @@
             font-size: 24px;
             font-weight: bold;
             margin: 0 auto 12px auto;
+            box-shadow: 0 0 10px rgba(181, 126, 220, 0.3);
         }
         .select-title {
             font-size: 16px;
@@ -165,15 +188,15 @@
         }
         .select-sub {
             font-size: 12px;
-            color: #777785;
+            color: #7d7894;
         }
         #video-input { display: none; }
 
         /* File Selected Preview Banner */
         .file-preview {
             display: none;
-            background: rgba(25, 25, 35, 0.8);
-            border: 1px solid #333342;
+            background: rgba(28, 22, 40, 0.8);
+            border: 1px solid #3d3353;
             border-radius: 10px;
             padding: 14px 18px;
             align-items: center;
@@ -192,9 +215,9 @@
             word-break: break-all;
         }
         .change-btn {
-            background: #252532;
-            border: 1px solid #3e3e50;
-            color: #ccc;
+            background: #2a2238;
+            border: 1px solid #4a3c63;
+            color: #d2c8e6;
             padding: 6px 14px;
             border-radius: 6px;
             font-size: 12px;
@@ -209,8 +232,8 @@
             margin-top: 15px;
         }
         .option-card {
-            border: 1px solid #2a2a38;
-            background: rgba(22, 22, 30, 0.7);
+            border: 1px solid #2e263d;
+            background: rgba(22, 18, 31, 0.7);
             border-radius: 12px;
             padding: 18px;
             display: flex;
@@ -221,12 +244,13 @@
             transition: all 0.2s ease;
         }
         .option-card.selected {
-            border-color: #ffc83b;
-            background: rgba(255, 200, 59, 0.03);
+            border-color: #b57edc;
+            background: rgba(181, 126, 220, 0.05);
+            box-shadow: 0 0 15px rgba(181, 126, 220, 0.15);
         }
         .option-card input[type="radio"] {
             margin-top: 4px;
-            accent-color: #ffc83b;
+            accent-color: #b57edc;
             width: 18px;
             height: 18px;
         }
@@ -240,7 +264,7 @@
             gap: 10px;
         }
         .recommended-badge {
-            background: #ffc83b;
+            background: #b57edc;
             color: #000;
             font-size: 10px;
             font-weight: 800;
@@ -250,7 +274,7 @@
         }
         .option-desc {
             font-size: 13px;
-            color: #8a8a98;
+            color: #928fa8;
             margin: 0;
             line-height: 1.4;
         }
@@ -258,7 +282,7 @@
         /* Submit Action Button */
         .submit-btn {
             width: 100%;
-            background: #ffc83b;
+            background: #b57edc;
             color: #000000;
             border: none;
             padding: 16px;
@@ -271,38 +295,39 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+            box-shadow: 0 0 15px rgba(181, 126, 220, 0.3);
             transition: transform 0.1s ease, background-color 0.2s ease;
         }
-        .submit-btn:hover { background: #e5b331; }
+        .submit-btn:hover { background: #9f62c8; }
         .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         /* Progress Bar */
         .progress-box {
             display: none;
             margin-top: 25px;
-            background: #14141c;
-            border: 1px solid #2a2a38;
+            background: #14101e;
+            border: 1px solid #3b3050;
             border-radius: 10px;
             padding: 18px;
         }
         .progress-status {
             font-size: 13px;
-            color: #ffc83b;
+            color: #b57edc;
             font-weight: 700;
             margin-bottom: 10px;
         }
         .progress-track {
             width: 100%;
             height: 12px;
-            background: #09090d;
+            background: #0a0810;
             border-radius: 6px;
             overflow: hidden;
-            border: 1px solid #22222e;
+            border: 1px solid #2d233e;
         }
         .progress-fill {
             height: 100%;
             width: 0%;
-            background: #ffc83b;
+            background: linear-gradient(90deg, #9f62c8, #b57edc);
             transition: width 0.3s ease;
         }
 
@@ -310,8 +335,8 @@
         .download-card {
             margin-top: 25px;
             padding: 20px;
-            background: rgba(255, 200, 59, 0.05);
-            border: 1px solid #ffc83b;
+            background: rgba(181, 126, 220, 0.08);
+            border: 1px solid #b57edc;
             border-radius: 12px;
             text-align: center;
         }
@@ -319,15 +344,20 @@
             display: inline-block;
             margin-top: 10px;
             padding: 14px 28px;
-            background: #ffc83b;
+            background: #b57edc;
             color: #000;
             text-decoration: none;
             font-weight: 800;
             border-radius: 8px;
+            box-shadow: 0 0 12px rgba(181, 126, 220, 0.4);
         }
     </style>
 </head>
 <body>
+
+<div class="top-navbar">
+    <div class="brand-logo">MaxyEU <span>OPTIMIZER</span></div>
+</div>
 
 <div class="main-container">
     <div class="header-section">
@@ -335,7 +365,6 @@
         <p class="header-subtitle">Choose a video, pick a method, and download the finished file.</p>
     </div>
 
-    <!-- Wizard Steps -->
     <div class="step-indicator-bar">
         <div class="step-node active" id="step-node-1">
             <div class="step-badge" id="step-badge-1">1</div>
@@ -354,7 +383,6 @@
     <div class="content-card">
         <form id="optimizer-form" action="/optimize" method="POST" enctype="multipart/form-data">
             
-            <!-- Step 1 Header -->
             <div class="section-header">
                 <div class="section-number">1</div>
                 <div>
@@ -363,14 +391,12 @@
                 </div>
             </div>
 
-            <!-- Upload Dropzone Area -->
             <div class="upload-dropzone" id="dropzone" onclick="document.getElementById('video-input').click()">
                 <div class="plus-icon">+</div>
                 <div class="select-title">Select video</div>
                 <div class="select-sub">or drag and drop your file here</div>
             </div>
 
-            <!-- Selected File Display -->
             <div class="file-preview" id="file-preview">
                 <div class="file-info">
                     <span>🎬</span>
@@ -381,7 +407,6 @@
 
             <input type="file" name="video" id="video-input" accept="video/*" onchange="handleFileSelect(this)" required>
 
-            <!-- Step 2 Header -->
             <div class="section-header" style="margin-top: 35px;">
                 <div class="section-number">2</div>
                 <div>
@@ -390,7 +415,6 @@
                 </div>
             </div>
 
-            <!-- Method Selection Cards -->
             <div class="options-group">
                 <label class="option-card selected">
                     <input type="radio" name="method" value="max_quality" checked onclick="selectMethod(this)">
@@ -420,13 +444,11 @@
                 </label>
             </div>
 
-            <!-- Submit Button -->
             <button type="submit" class="submit-btn" id="submit-btn">
                 Start processing <span>→</span>
             </button>
         </form>
 
-        <!-- Progress Tracker -->
         <div class="progress-box" id="progress-box">
             <div class="progress-status" id="progress-status">Uploading Video... 0%</div>
             <div class="progress-track">
@@ -434,10 +456,9 @@
             </div>
         </div>
 
-        <!-- Step 3 Download Container -->
         {% if download_file %}
             <div class="download-card" id="download-section">
-                <h3 style="margin: 0; color: #ffc83b;">Optimization Complete!</h3>
+                <h3 style="margin: 0; color: #b57edc;">Optimization Complete!</h3>
                 <p style="font-size: 13px; color: #aaa; margin: 5px 0 15px 0;">Your video file is optimized and ready.</p>
                 <a class="download-btn" href="{{ url_for('download_file', filename=download_file) }}">Download Optimized Video</a>
             </div>
@@ -452,7 +473,6 @@
             document.getElementById('file-preview').style.display = 'flex';
             document.getElementById('file-name-text').innerText = input.files[0].name;
 
-            // Activate Step 2 Node
             document.getElementById('step-node-2').classList.add('active');
             document.getElementById('step-badge-1').innerText = '✓';
         }
