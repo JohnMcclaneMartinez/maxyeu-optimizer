@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Analysis - TIKTOK OPTIMIZER BY MAXY</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(rgba(8, 8, 12, 0.85), rgba(8, 8, 12, 0.85)), url('/static/bg.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: rgba(26, 26, 36, 0.95);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8);
+            width: 460px;
+            max-width: 90vw;
+            position: relative;
+            border: 1px solid #333;
+        }
+        h1 { font-size: 20px; color: #ff0050; text-align: center; margin-bottom: 5px; }
+        h2 { font-size: 13px; color: #00f2fe; text-align: center; margin-top: 0; margin-bottom: 20px; }
+        
+        .info-card {
+            background: #111118;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 12px 18px;
+            margin-bottom: 15px;
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #222;
+            font-size: 14px;
+        }
+        .info-row:last-child { border-bottom: none; }
+        .label { color: #aaa; }
+        .val { font-weight: bold; color: #00f2fe; }
+
+        .settings-card {
+            background: #111118;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .settings-title { font-size: 13px; color: #ff0050; font-weight: bold; margin-bottom: 10px; }
+        .setting-group { margin-bottom: 10px; font-size: 13px; }
+        .setting-group label { display: block; margin-bottom: 5px; color: #ccc; }
+        select {
+            width: 100%;
+            padding: 8px;
+            background: #1a1a24;
+            color: #fff;
+            border: 1px solid #444;
+            border-radius: 4px;
+        }
+        .checkbox-group { display: flex; align-items: center; gap: 8px; font-size: 13px; margin-top: 10px; }
+        
+        .opt-btn {
+            background: linear-gradient(45deg, #ff0050, #00f2fe);
+            border: none;
+            color: white;
+            padding: 14px;
+            font-weight: bold;
+            font-size: 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .back-btn {
+            display: block;
+            text-align: center;
+            background: #333;
+            color: #ccc;
+            text-decoration: none;
+            padding: 10px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        #loading-overlay {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(26, 26, 36, 0.96);
+            border-radius: 12px;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            padding: 30px;
+        }
+        .loading-text { font-size: 16px; font-weight: bold; color: #ffffff; margin-bottom: 8px; }
+        .progress-container {
+            width: 100%;
+            background-color: #111118;
+            border: 1px solid #333;
+            border-radius: 8px;
+            height: 24px;
+            overflow: hidden;
+            margin: 15px 0 10px 0;
+        }
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #ff0050, #00f2fe);
+            transition: width 0.3s ease;
+        }
+        .percent-text { font-size: 14px; font-weight: bold; color: #00f2fe; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>TIKTOK OPTIMIZER BY MAXY</h1>
+        <h2>VIDEO ANALYSIS & SETTINGS</h2>
+        
+        <div class="info-card">
+            <div class="info-row"><span class="label">File Name</span><span class="val">{{ info.filename }}</span></div>
+            <div class="info-row"><span class="label">Resolution</span><span class="val">{{ info.width }} × {{ info.height }}</span></div>
+            <div class="info-row"><span class="label">FPS</span><span class="val">{{ info.fps }}</span></div>
+            <div class="info-row"><span class="label">File Size</span><span class="val">{{ info.size }}</span></div>
+        </div>
+
+        <div class="settings-card">
+            <div class="settings-title">OPTIMIZATION PRESETS</div>
+            <div class="setting-group">
+                <label for="preset">Encoding Quality Profile:</label>
+                <select id="preset">
+                    <option value="max" selected>Max Quality (Slow Render, Max Sharpness)</option>
+                    <option value="fast">Fast Render (Quick Render, Balanced)</option>
+                </select>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="normalize_audio" checked>
+                <label for="normalize_audio">Normalize Audio (Boost Voice/Game Balance)</label>
+            </div>
+        </div>
+
+        <button onclick="startOptimization()" class="opt-btn">⚡ OPTIMIZE FOR TIKTOK NOW</button>
+        <a href="/" class="back-btn">← UPLOAD ANOTHER VIDEO</a>
+
+        <div id="loading-overlay">
+            <div class="loading-text">ENCODING VIDEO...</div>
+            <div class="progress-container">
+                <div id="progress-bar" class="progress-bar"></div>
+            </div>
+            <div id="percent-text" class="percent-text">0%</div>
+        </div>
+    </div>
+
+    <script>
+        const filename = "{{ info.filename }}";
+
+        function startOptimization() {
+            const preset = document.getElementById('preset').value;
+            const normalizeAudio = document.getElementById('normalize_audio').checked;
+
+            document.getElementById('loading-overlay').style.display = 'flex';
+
+            fetch('/start_optimize', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    filename: filename,
+                    preset: preset,
+                    normalize_audio: normalizeAudio
+                })
+            });
+
+            const pollInterval = setInterval(() => {
+                fetch(`/progress/${filename}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        const percent = data.percent;
+                        document.getElementById('progress-bar').style.width = percent + '%';
+                        document.getElementById('percent-text').innerText = percent + '%';
+
+                        if (percent >= 100) {
+                            clearInterval(pollInterval);
+                            window.location.href = `/download_page/${filename}`;
+                        }
+                    });
+            }, 500);
+        }
+    </script>
+</body>
+</html>
