@@ -79,17 +79,17 @@ def optimize_video():
     try:
         ffmpeg_bin = imageio_ffmpeg.get_ffmpeg_exe()
         
-        # Speed-Optimized FFmpeg Call
+        # High-Quality & Clear Encoding Parameters
         (
             ffmpeg
             .input(input_path)
             .output(
                 output_path,
                 vcodec='libx264',
-                preset='ultrafast',
-                tune='fastdecode',
-                crf=26,
-                vf='scale=-2:720'
+                preset='superfast', # Upgraded from ultrafast to retain sharp details
+                crf=20,             # Lower CRF eliminates heavy pixelation/grain
+                vf='scale=-2:1080', # Maintains crisp 1080p resolution
+                pix_fmt='yuv420p'   # Ensures full mobile video player compatibility
             )
             .overwrite_output()
             .run(cmd=ffmpeg_bin, capture_stdout=True, capture_stderr=True)
