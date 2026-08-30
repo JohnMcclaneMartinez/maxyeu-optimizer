@@ -99,7 +99,7 @@ def optimize_video():
         if optimize_tiktok:
             output_args['maxrate'] = '8M'
             output_args['bufsize'] = '16M'
-            output_args['crf'] = max(crf_val, 23)  # Slightly higher CRF for reduced file size
+            output_args['crf'] = max(crf_val, 23)
 
         (
             ffmpeg
