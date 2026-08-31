@@ -95,7 +95,8 @@
     /* Hero Profile Card */
     .hero-card {
       position: relative;
-      background-color: #121318;
+      background-color: rgba(18, 19, 24, 0.75);
+      backdrop-filter: blur(16px);
       border: 1px solid rgba(168, 85, 247, 0.25);
       border-radius: 16px;
       padding: 40px;
@@ -185,7 +186,7 @@
       box-shadow: 0 0 8px #4ade80;
     }
 
-    /* Social Links */
+    /* Glassmorphism Social Links */
     .social-links {
       display: flex;
       gap: 12px;
@@ -196,20 +197,24 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      background-color: #1e1f28;
-      color: #e0e0e0;
-      border: 1px solid #2d2f3a;
+      background: rgba(192, 132, 252, 0.12);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: #f3e8ff;
+      border: 1px solid rgba(192, 132, 252, 0.25);
       padding: 8px 18px;
       border-radius: 20px;
       text-decoration: none;
       font-size: 0.88rem;
-      transition: all 0.2s ease;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     .social-btn:hover {
-      border-color: #c084fc;
-      color: #c084fc;
-      box-shadow: 0 0 12px rgba(192, 132, 252, 0.3);
+      background: rgba(192, 132, 252, 0.22);
+      border-color: rgba(192, 132, 252, 0.5);
+      color: #ffffff;
+      box-shadow: 0 0 16px rgba(192, 132, 252, 0.4);
       transform: translateY(-2px);
     }
 
@@ -217,7 +222,7 @@
     .preview-box {
       width: 260px;
       height: 160px;
-      background-color: #1a1b22;
+      background-color: rgba(26, 27, 34, 0.6);
       border: 1px dashed rgba(192, 132, 252, 0.4);
       border-radius: 12px;
       display: flex;
@@ -234,7 +239,7 @@
       border-radius: 12px;
     }
 
-    /* Main Action Button Area */
+    /* Glassmorphism Main Action Button */
     .action-container {
       display: flex;
       justify-content: center;
@@ -245,27 +250,30 @@
       display: inline-flex;
       align-items: center;
       gap: 12px;
-      background: linear-gradient(135deg, #a855f7 0%, #c084fc 100%);
-      color: #0b0c10;
-      font-weight: 800;
+      background: rgba(168, 85, 247, 0.25);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: #ffffff;
+      border: 1px solid rgba(192, 132, 252, 0.4);
+      font-weight: 700;
       font-size: 1.1rem;
       padding: 16px 36px;
       border-radius: 14px;
       text-decoration: none;
       transition: all 0.3s ease;
-      box-shadow: 0 4px 20px rgba(168, 85, 247, 0.4);
+      box-shadow: 0 8px 25px rgba(168, 85, 247, 0.25);
     }
 
     .main-tool-btn:hover {
+      background: rgba(192, 132, 252, 0.38);
+      border-color: rgba(192, 132, 252, 0.7);
       transform: translateY(-3px);
-      box-shadow: 0 8px 30px rgba(192, 132, 252, 0.6);
-      filter: brightness(1.1);
+      box-shadow: 0 10px 35px rgba(192, 132, 252, 0.5);
     }
   </style>
 </head>
 <body>
 
-  <!-- Header Navigation -->
   <header>
     <a href="/" class="brand">
       MaxyEU
@@ -276,13 +284,10 @@
     </nav>
   </header>
 
-  <!-- Main Content Container -->
   <main>
-    <!-- Profile Card -->
     <div class="hero-card">
       <div>
         <div class="profile-header">
-          <!-- Avatar with Circling Light Ring -->
           <div class="avatar-wrapper">
             <img src="{{ url_for('static', filename='avatar.jpg') }}" alt="Avatar" class="avatar-img" onerror="this.src='https://via.placeholder.com/80/121318/c084fc?text=Maxy'">
           </div>
@@ -308,13 +313,11 @@
         </div>
       </div>
 
-      <!-- Preview Visual -->
       <div class="preview-box">
         <img src="{{ url_for('static', filename='feature-preview.jpg') }}" alt="Preview Visual" onerror="this.parentElement.innerHTML='📷 Preview Visual'">
       </div>
     </div>
 
-    <!-- Single Action Button to Tool Page -->
     <div class="action-container">
       <a href="/app" class="main-tool-btn">
         🚀 Open Video Processor Tool →
