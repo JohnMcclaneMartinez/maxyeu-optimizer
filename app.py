@@ -35,44 +35,40 @@ def optimize():
 
     ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
 
-    # Build video filter chain dynamically
-    vf_filters = []
-    
-    if method == '720p60':
-        vf_filters.append('scale=-2:720')
-        vf_filters.append('fps=60')
-    elif method == 'fps_patch':
-        vf_filters.append('fps=60')
-    else:  # max_quality
-        vf_filters.append('scale=-2:1080')
-
-    # Construct strict FFmpeg command structure
+    # Base FFmpeg command with enlarged probesize for complex video containers
     ffmpeg_cmd = [
         ffmpeg_exe, '-y',
-        '-i', input_path,
-        '-c:v', 'libx264',
-        '-preset', 'fast',
-        '-crf', '22'
+        '-analyzeduration', '100M',
+        '-probesize', '100M',
+        '-i', input_path
     ]
 
-    # Add video filters if defined
-    if vf_filters:
-        ffmpeg_cmd.extend(['-vf', ','.join(vf_filters)])
+    # Configure resolution scaling and frame rates safely
+    if method == '720p60':
+        ffmpeg_cmd.extend(['-vf', 'scale=trunc(iw/2)*2:720', '-r', '60'])
+    elif method == 'fps_patch':
+        ffmpeg_cmd.extend(['-r', '60'])
+    else:  # max_quality (1080p limit, preserving aspect ratio)
+        ffmpeg_cmd.extend(['-vf', 'scale=-2:1080'])
 
-    # Handle TikTok bitrate constraints safely
+    # Codecs and output parameters
+    ffmpeg_cmd.extend([
+        '-c:v', 'libx264',
+        '-preset', 'fast',
+        '-crf', '22',
+        '-pix_fmt', 'yuv420p',
+        '-c:a', 'aac',
+        '-b:a', '192k',
+        '-ac', '2'
+    ])
+
     if optimize_tiktok == 'yes':
         ffmpeg_cmd.extend(['-maxrate', '12M', '-bufsize', '16M'])
 
-    # Audio settings & output path
-    ffmpeg_cmd.extend([
-        '-c:a', 'aac',
-        '-b:a', '192k',
-        output_path
-    ])
+    ffmpeg_cmd.append(output_path)
 
     try:
-        # Run FFmpeg process
-        process = subprocess.run(
+        subprocess.run(
             ffmpeg_cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -89,15 +85,14 @@ def optimize():
         })
 
     except subprocess.CalledProcessError as e:
-        # Extract meaningful error details from stdout/stderr
-        err_msg = e.stderr.strip() if e.stderr else "Unknown encoding error"
-        filtered_lines = [line for line in err_msg.split('\n') if "error" in line.lower() or "invalid" in line.lower()]
-        final_error = filtered_lines[-1] if filtered_lines else err_msg[-200:]
+        # Log clean error details if processing fails
+        err_lines = [l for l in e.stderr.split('\n') if 'error' in l.lower() or 'invalid' in l.lower()]
+        clean_err = err_lines[-1] if err_lines else "Stream processing failed."
 
         if os.path.exists(input_path):
             os.remove(input_path)
             
-        return jsonify({'success': False, 'error': f"FFmpeg Error: {final_error}"}), 500
+        return jsonify({'success': False, 'error': f"FFmpeg Processing Error: {clean_err}"}), 500
 
     except Exception as e:
         if os.path.exists(input_path):
