@@ -1,98 +1,75 @@
 import os
 import subprocess
-from flask import Flask, request, render_template, send_file, redirect, url_for, flash
-from werkzeug.utils import secure_filename
+from flask import Flask, render_template, request, jsonify, send_from_directory, url_for
 
 app = Flask(__name__)
-app.secret_key = "supersecretkey"
-
-# Folder configurations
 UPLOAD_FOLDER = 'uploads'
-PROCESSED_FOLDER = 'processed'
-ALLOWED_EXTENSIONS = {'mp4', 'mov', 'avi', 'mkv', 'webm'}
-
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['PROCESSED_FOLDER'] = PROCESSED_FOLDER
+OUTPUT_FOLDER = 'processed'
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-os.makedirs(PROCESSED_FOLDER, exist_ok=True)
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
 @app.route('/optimize', methods=['POST'])
-def optimize_video():
-    if 'file' not in request.files:
-        flash('No file uploaded')
-        return redirect(url_for('index'))
-
-    file = request.files['file']
-
+def optimize():
+    if 'video' not in request.files:
+        return jsonify({'success': False, 'error': 'No video file provided'}), 400
+    
+    file = request.files['video']
     if file.filename == '':
-        flash('No selected file')
-        return redirect(url_for('index'))
+        return jsonify({'success': False, 'error': 'No selected file'}), 400
 
-    if file and allowed_file(file.filename):
-        filename = secure_filename(file.filename)
-        input_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        
-        output_filename = f"optimized_{filename}"
-        output_path = os.path.join(app.config['PROCESSED_FOLDER'], output_filename)
-        
-        file.save(input_path)
+    method = request.form.get('method', 'max_quality')
+    optimize_tiktok = request.form.get('optimize_tiktok')
 
-        # Retrieve user's method selection and TikTok optimization checkbox from the form
-        selected_method = request.form.get('method', 'max_quality')
-        tiktok_optimize = request.form.get('tiktok')  # Checkbox value
+    # Save uploaded file safely
+    input_path = os.path.join(UPLOAD_FOLDER, file.filename)
+    file.save(input_path)
 
-        # Base CPU-safe command (Forces libx264 and ultrafast to run smoothly on Railway)
-        command = [
-            'ffmpeg', '-y',
-            '-i', input_path,
-            '-c:v', 'libx264',
-            '-preset', 'ultrafast'
-        ]
+    output_filename = f"optimized_{file.filename}"
+    output_path = os.path.join(OUTPUT_FOLDER, output_filename)
 
-        # Apply specific parameters depending on the selected method
-        if selected_method == '720p60':
-            command.extend(['-vf', 'scale=1280:720', '-r', '60', '-crf', '26'])
-        elif selected_method == 'fps':
-            command.extend(['-r', '60', '-crf', '24'])
-        else:  # Default: Max Quality + FPS Method
-            command.extend(['-vf', 'scale=1920:-2', '-crf', '23'])
+    # Base FFmpeg command setup
+    ffmpeg_cmd = ['ffmpeg', '-y', '-i', input_path]
 
-        # Apply tighter compression if the TikTok optimization checkbox is checked
-        if tiktok_optimize:
-            # Adjust CRF/Bitrate lower for smaller file sizes ideal for social media sharing
-            command.extend(['-crf', '28'])
+    # Apply processing presets based on selected method
+    if method == '720p60':
+        ffmpeg_cmd.extend(['-vf', 'scale=-2:720', '-r', '60', '-c:v', 'libx264', '-crf', '22', '-preset', 'fast'])
+    elif method == 'fps_patch':
+        ffmpeg_cmd.extend(['-r', '60', '-c:v', 'libx264', '-crf', '20', '-preset', 'fast'])
+    else:  # max_quality
+        ffmpeg_cmd.extend(['-vf', 'scale=-2:1080', '-c:v', 'libx264', '-crf', '18', '-preset', 'medium'])
 
-        # Finalize audio copy and multi-threading parameters
-        command.extend([
-            '-c:a', 'copy',
-            '-threads', '0',
-            output_path
-        ])
+    if optimize_tiktok == 'yes':
+        ffmpeg_cmd.extend(['-maxrate', '12M', '-bufsize', '16M'])
 
-        try:
-            # Execute FFmpeg optimization on CPU
-            subprocess.run(command, check=True)
-            return send_file(output_path, as_attachment=True)
+    ffmpeg_cmd.extend(['-c:a', 'aac', '-b:a', '192k', output_path])
 
-        except subprocess.CalledProcessError as e:
-            flash(f"Error during video processing: {e}")
-            return redirect(url_for('index'))
-        
-        finally:
-            if os.path.exists(input_path):
-                os.remove(input_path)
+    try:
+        # Run encoding on server
+        subprocess.run(ffmpeg_cmd, check=True)
 
-    flash('File type not allowed')
-    return redirect(url_for('index'))
+        # Cleanup input file to save disk space on Railway
+        if os.path.exists(input_path):
+            os.remove(input_path)
+
+        # Send JSON response back to JS frontend
+        return jsonify({
+            'success': True,
+            'download_url': url_for('download_file', filename=output_filename)
+        })
+
+    except subprocess.CalledProcessError as e:
+        if os.path.exists(input_path):
+            os.remove(input_path)
+        return jsonify({'success': False, 'error': 'FFmpeg processing failed'}), 500
+
+@app.route('/download/<filename>')
+def download_file(filename):
+    return send_from_directory(OUTPUT_FOLDER, filename, as_attachment=True)
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host='0.0.0.0', port=5000, debug=True)
