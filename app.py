@@ -1,99 +1,79 @@
 import os
 import subprocess
-import traceback
-import imageio_ffmpeg
-from flask import Flask, render_template, request, jsonify, send_from_directory, url_for
+from flask import Flask, render_template, request, send_file, flash, redirect, url_for
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
-UPLOAD_FOLDER = 'uploads'
-OUTPUT_FOLDER = 'processed'
+app.secret_key = 'super_secret_key_for_flash'
+
+# Configure upload and processed folders
+UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')
+PROCESSED_FOLDER = os.path.join(os.getcwd(), 'processed')
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-os.makedirs(OUTPUT_FOLDER, exist_ok=True)
+os.makedirs(PROCESSED_FOLDER, exist_ok=True)
 
+ALLOWED_EXTENSIONS = {'mp4', 'mov', 'mkv', 'avi', 'webm'}
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# 1. LANDING / HOME PAGE ROUTE
 @app.route('/')
-def index():
+def home():
+    return render_template('home.html')
+
+# 2. VIDEO PROCESSOR TOOL ROUTE
+@app.route('/app')
+def processor():
     return render_template('index.html')
 
+# 3. VIDEO PROCESSING ENDPOINT
 @app.route('/optimize', methods=['POST'])
 def optimize():
     if 'video' not in request.files:
-        return jsonify({'success': False, 'error': 'No video file provided'}), 400
-    
+        flash('No video file provided')
+        return redirect(url_for('processor'))
+
     file = request.files['video']
     if file.filename == '':
-        return jsonify({'success': False, 'error': 'No selected file'}), 400
+        flash('No file selected')
+        return redirect(url_for('processor'))
 
-    method = request.form.get('method', 'max_quality')
-    optimize_tiktok = request.form.get('optimize_tiktok')
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        input_path = os.path.join(UPLOAD_FOLDER, filename)
+        file.save(input_path)
 
-    input_path = os.path.join(UPLOAD_FOLDER, file.filename)
-    file.save(input_path)
+        output_filename = f"optimized_{filename}"
+        output_path = os.path.join(PROCESSED_FOLDER, output_filename)
 
-    output_filename = f"optimized_{file.filename}"
-    output_path = os.path.join(OUTPUT_FOLDER, output_filename)
+        # Get settings from form
+        method = request.form.get('method', 'speed')
+        
+        # FFmpeg low-RAM baseline configuration
+        ffmpeg_cmd = [
+            'ffmpeg', '-y',
+            '-i', input_path,
+            '-c:v', 'libx264',
+            '-preset', 'ultrafast',
+            '-crf', '26',
+            '-vf', 'scale=-2:1080',
+            '-c:a', 'aac',
+            '-b:a', '128k',
+            '-threads', '2',
+            output_path
+        ]
 
-    ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
+        try:
+            subprocess.run(ffmpeg_cmd, check=True)
+            return send_file(output_path, as_attachment=True)
+        except subprocess.CalledProcessError as e:
+            flash(f'Error processing video: {str(e)}')
+            return redirect(url_for('processor'))
 
-    # Dynamic scaling based on selected method
-    if method == '720p60':
-        scale_filter = 'scale=trunc(iw/2)*2:720,fps=60'
-    elif method == 'fps_patch':
-        scale_filter = 'fps=60'
-    else:  # max_quality capped to 720p maximum to prevent OOM kills on Railway
-        scale_filter = 'scale=trunc(iw/2)*2:720'
-
-    # Strict low-RAM FFmpeg flags to avoid Railway SIGKILL (-9)
-    ffmpeg_cmd = [
-        ffmpeg_exe, '-y',
-        '-threads', '1',               # Single thread caps RAM overhead
-        '-i', input_path,
-        '-vf', scale_filter,
-        '-c:v', 'libx264',
-        '-preset', 'ultrafast',        # Lowest RAM usage profile
-        '-tune', 'fastdecode',
-        '-crf', '26',                   # Lightweight compression profile
-        '-pix_fmt', 'yuv420p'
-    ]
-
-    if optimize_tiktok == 'yes':
-        ffmpeg_cmd.extend(['-maxrate', '6M', '-bufsize', '6M'])
-
-    ffmpeg_cmd.extend([
-        '-c:a', 'aac',
-        '-b:a', '128k',
-        '-ac', '2',
-        output_path
-    ])
-
-    try:
-        res = subprocess.run(
-            ffmpeg_cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True
-        )
-
-        if res.returncode != 0:
-            err_log = "\n".join(res.stderr.strip().split('\n')[-3:])
-            raise Exception(f"FFmpeg error code {res.returncode}: {err_log}")
-
-        if os.path.exists(input_path):
-            os.remove(input_path)
-
-        return jsonify({
-            'success': True,
-            'download_url': url_for('download_file', filename=output_filename)
-        })
-
-    except Exception as e:
-        if os.path.exists(input_path):
-            os.remove(input_path)
-        return jsonify({'success': False, 'error': str(e)}), 500
-
-@app.route('/download/<filename>')
-def download_file(filename):
-    return send_from_directory(OUTPUT_FOLDER, filename, as_attachment=True)
+    flash('Invalid file extension')
+    return redirect(url_for('processor'))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
