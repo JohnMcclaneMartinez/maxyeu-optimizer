@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MaxyEU - Portfolio & Tools</title>
+  <title>MaxyEU - Home</title>
   <style>
     /* Reset & Base Styles */
     * {
@@ -46,17 +46,6 @@
     .text-violet {
       color: #c084fc;
       text-shadow: 0 0 12px rgba(192, 132, 252, 0.5);
-    }
-
-    .badge-violet {
-      background-color: #c084fc;
-      color: #0b0c10;
-      font-weight: 700;
-      padding: 2px 10px;
-      border-radius: 12px;
-      font-size: 0.75rem;
-      display: inline-block;
-      animation: pulseGlow 3s infinite ease-in-out;
     }
 
     /* Navigation Header */
@@ -114,7 +103,7 @@
       justify-content: space-between;
       align-items: center;
       overflow: hidden;
-      margin-bottom: 50px;
+      margin-bottom: 40px;
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     }
 
@@ -172,7 +161,7 @@
     }
 
     .profile-bio {
-      color: #94a3b8 bio;
+      color: #94a3b8;
       max-width: 540px;
       line-height: 1.6;
       margin-bottom: 20px;
@@ -249,80 +238,32 @@
       border-radius: 12px;
     }
 
-    /* Projects Section */
-    .section-title {
+    /* Main Action Button Area */
+    .action-container {
       display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 1.4rem;
-      margin-bottom: 24px;
-      color: #ffffff;
+      justify-content: center;
+      margin-top: 30px;
     }
 
-    .section-title svg {
-      fill: #c084fc;
-      width: 22px;
-      height: 22px;
-      animation: pulseGlow 3s infinite ease-in-out;
-    }
-
-    .projects-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
-    }
-
-    .project-card {
-      background-color: #121318;
-      border: 1px solid #1e1f28;
-      border-radius: 14px;
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      transition: all 0.3s ease;
-    }
-
-    .project-card:hover {
-      border-color: rgba(192, 132, 252, 0.5);
-      box-shadow: 0 6px 20px rgba(168, 85, 247, 0.15);
-      transform: translateY(-4px);
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-
-    .card-title {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: #ffffff;
-    }
-
-    .card-desc {
-      color: #94a3b8;
-      font-size: 0.9rem;
-      line-height: 1.5;
-      margin-bottom: 20px;
-    }
-
-    .card-action {
-      color: #c084fc;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 0.9rem;
+    .main-tool-btn {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      transition: gap 0.2s ease;
+      gap: 12px;
+      background: linear-gradient(135deg, #a855f7 0%, #c084fc 100%);
+      color: #0b0c10;
+      font-weight: 800;
+      font-size: 1.1rem;
+      padding: 16px 36px;
+      border-radius: 14px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(168, 85, 247, 0.4);
     }
 
-    .card-action:hover {
-      gap: 8px;
-      text-shadow: 0 0 10px rgba(192, 132, 252, 0.6);
+    .main-tool-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(192, 132, 252, 0.6);
+      filter: brightness(1.1);
     }
   </style>
 </head>
@@ -334,9 +275,7 @@
       MaxyEU
     </a>
     <nav>
-      <a href="#projects">Projects</a>
       <a href="/app">Processor Tool</a>
-      <a href="#quality">Quality</a>
       <a href="#status">Status</a>
     </nav>
   </header>
@@ -373,57 +312,17 @@
         </div>
       </div>
 
-      <!-- Optional Preview Visual -->
+      <!-- Preview Visual -->
       <div class="preview-box">
         <img src="{{ url_for('static', filename='feature-preview.jpg') }}" alt="Preview Visual" onerror="this.parentElement.innerHTML='📷 Preview Visual'">
       </div>
     </div>
 
-    <!-- Projects Section -->
-    <div id="projects">
-      <h2 class="section-title">
-        <svg viewBox="0 0 24 24">
-          <path d="M4 6h16v2H4zm2 4h12v2H6zm-2 4h16v2H4zm2 4h12v2H6z"/>
-        </svg>
-        Projects
-      </h2>
-
-      <div class="projects-grid">
-        <!-- Project 1 -->
-        <div class="project-card">
-          <div>
-            <div class="card-header">
-              <span class="card-title">MaxyEU Method</span>
-              <span class="badge-violet">Tool</span>
-            </div>
-            <p class="card-desc">TikTok upload method & video optimizer tool to bypass aggressive platform compression.</p>
-          </div>
-          <a href="/app" class="card-action">Open Processing Tool →</a>
-        </div>
-
-        <!-- Project 2 -->
-        <div class="project-card">
-          <div>
-            <div class="card-header">
-              <span class="card-title">MaxyStream</span>
-              <span class="badge-violet">Public</span>
-            </div>
-            <p class="card-desc">Modern lightweight temporary video hosting platform.</p>
-          </div>
-          <a href="#" class="card-action">Open →</a>
-        </div>
-
-        <!-- Project 3 -->
-        <div class="project-card">
-          <div>
-            <div class="card-header">
-              <span class="card-title">MaxyEU Community</span>
-            </div>
-            <p class="card-desc">Official Discord server for updates and encoding support.</p>
-          </div>
-          <a href="#" class="card-action">Join →</a>
-        </div>
-      </div>
+    <!-- Single Action Button to Tool Page -->
+    <div class="action-container">
+      <a href="/app" class="main-tool-btn">
+        🚀 Open Video Processor Tool →
+      </a>
     </div>
   </main>
 
