@@ -21,7 +21,7 @@
       flex-direction: column;
     }
 
-    /* Live Video Background Styling */
+    /* Full Web Page Live Video Background */
     #bg-video {
       position: fixed;
       top: 0;
@@ -30,24 +30,24 @@
       min-height: 100%;
       width: auto;
       height: auto;
-      z-index: -1;
+      z-index: -2;
       object-fit: cover;
-      filter: brightness(0.5); /* Adjust opacity/brightness of the live background */
+      filter: brightness(0.4);
     }
 
-    /* Floating / Circling Light Glow Animations */
+    /* Floating / Glow Animations */
     @keyframes pulseGlow {
       0% {
-        text-shadow: 0 0 10px rgba(168, 85, 247, 0.5), 0 0 20px rgba(192, 132, 252, 0.3);
-        filter: drop-shadow(0 0 4px rgba(168, 85, 247, 0.6));
+        text-shadow: 0 0 12px rgba(168, 85, 247, 0.6), 0 0 22px rgba(192, 132, 252, 0.4);
+        filter: drop-shadow(0 0 4px rgba(168, 85, 247, 0.7));
       }
       50% {
-        text-shadow: 0 0 25px rgba(192, 132, 252, 0.9), 0 0 40px rgba(168, 85, 247, 0.7);
-        filter: drop-shadow(0 0 12px rgba(192, 132, 252, 0.9));
+        text-shadow: 0 0 28px rgba(192, 132, 252, 0.95), 0 0 45px rgba(168, 85, 247, 0.85);
+        filter: drop-shadow(0 0 14px rgba(192, 132, 252, 0.95));
       }
       100% {
-        text-shadow: 0 0 10px rgba(168, 85, 247, 0.5), 0 0 20px rgba(192, 132, 252, 0.3);
-        filter: drop-shadow(0 0 4px rgba(168, 85, 247, 0.6));
+        text-shadow: 0 0 12px rgba(168, 85, 247, 0.6), 0 0 22px rgba(192, 132, 252, 0.4);
+        filter: drop-shadow(0 0 4px rgba(168, 85, 247, 0.7));
       }
     }
 
@@ -56,10 +56,15 @@
       100% { transform: rotate(360deg); }
     }
 
-    /* Color Palette Utility Classes */
+    /* Color Utilities */
     .text-violet {
       color: #c084fc;
       text-shadow: 0 0 12px rgba(192, 132, 252, 0.5);
+    }
+
+    .text-deep-violet {
+      color: #8b5cf6;
+      text-shadow: 0 0 14px rgba(139, 92, 246, 0.6);
     }
 
     /* Navigation Header */
@@ -77,17 +82,25 @@
     .brand {
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-size: 2.2rem;
-      font-weight: 800;
-      color: #c084fc;
+      gap: 2px;
+      font-size: 2.6rem;
+      font-weight: 900;
+      letter-spacing: -0.5px;
       text-decoration: none;
       animation: pulseGlow 2.5s infinite ease-in-out;
       transition: transform 0.3s ease;
     }
 
+    .brand .brand-maxy {
+      color: #c084fc;
+    }
+
+    .brand .brand-eu {
+      color: #8b5cf6;
+    }
+
     .brand:hover {
-      transform: scale(1.02);
+      transform: scale(1.03);
     }
 
     nav {
@@ -114,13 +127,10 @@
       width: 100%;
     }
 
-    /* Hero Profile Card */
+    /* Hero Profile Card with Static Image Background */
     .hero-card {
       position: relative;
-      background-color: rgba(18, 19, 24, 0.65);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(168, 85, 247, 0.25);
+      border: 1px solid rgba(168, 85, 247, 0.35);
       border-radius: 16px;
       padding: 40px;
       display: flex;
@@ -128,10 +138,37 @@
       align-items: center;
       overflow: hidden;
       margin-bottom: 40px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+      /* Static Image Background */
+      background-image: url("{{ url_for('static', filename='card-bg.jpg') }}");
+      background-size: cover;
+      background-position: center;
     }
 
-    /* Circling Light Ring around Avatar */
+    /* Glass Overlay over Card Image */
+    .card-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(18, 19, 24, 0.65);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      z-index: 1;
+    }
+
+    /* Card Content Above Overlay */
+    .hero-card-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+
+    /* Avatar Ring */
     .avatar-wrapper {
       position: relative;
       width: 84px;
@@ -173,18 +210,23 @@
     .profile-name {
       font-size: 2.2rem;
       font-weight: 800;
-      color: #c084fc;
-      display: flex;
-      align-items: center;
-      gap: 8px;
       animation: pulseGlow 2.5s infinite ease-in-out;
     }
 
+    .profile-name .name-maxy {
+      color: #c084fc;
+    }
+
+    .profile-name .name-eu {
+      color: #8b5cf6;
+    }
+
     .profile-bio {
-      color: #94a3b8;
+      color: #e2e8f0;
       max-width: 540px;
       line-height: 1.6;
       margin-bottom: 20px;
+      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
     }
 
     /* Status indicator */
@@ -192,8 +234,9 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: rgba(34, 197, 94, 0.1);
-      border: 1px solid rgba(34, 197, 94, 0.3);
+      background: rgba(34, 197, 94, 0.15);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(34, 197, 94, 0.4);
       color: #4ade80;
       padding: 6px 14px;
       border-radius: 20px;
@@ -220,24 +263,24 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      background: rgba(192, 132, 252, 0.12);
+      background: rgba(192, 132, 252, 0.15);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       color: #f3e8ff;
-      border: 1px solid rgba(192, 132, 252, 0.25);
+      border: 1px solid rgba(192, 132, 252, 0.3);
       padding: 8px 18px;
       border-radius: 20px;
       text-decoration: none;
       font-size: 0.88rem;
       transition: all 0.3s ease;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
 
     .social-btn:hover {
-      background: rgba(192, 132, 252, 0.22);
-      border-color: rgba(192, 132, 252, 0.5);
+      background: rgba(192, 132, 252, 0.28);
+      border-color: rgba(192, 132, 252, 0.6);
       color: #ffffff;
-      box-shadow: 0 0 16px rgba(192, 132, 252, 0.4);
+      box-shadow: 0 0 16px rgba(192, 132, 252, 0.5);
       transform: translateY(-2px);
     }
 
@@ -261,7 +304,7 @@
       border-radius: 12px;
     }
 
-    /* Glassmorphism Main Action Button */
+    /* Main Action Button */
     .action-container {
       display: flex;
       justify-content: center;
@@ -272,25 +315,25 @@
       display: inline-flex;
       align-items: center;
       gap: 12px;
-      background: rgba(168, 85, 247, 0.25);
+      background: rgba(168, 85, 247, 0.28);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       color: #ffffff;
-      border: 1px solid rgba(192, 132, 252, 0.4);
+      border: 1px solid rgba(192, 132, 252, 0.45);
       font-weight: 700;
       font-size: 1.1rem;
       padding: 16px 36px;
       border-radius: 14px;
       text-decoration: none;
       transition: all 0.3s ease;
-      box-shadow: 0 8px 25px rgba(168, 85, 247, 0.25);
+      box-shadow: 0 8px 25px rgba(168, 85, 247, 0.3);
     }
 
     .main-tool-btn:hover {
-      background: rgba(192, 132, 252, 0.38);
-      border-color: rgba(192, 132, 252, 0.7);
+      background: rgba(192, 132, 252, 0.42);
+      border-color: rgba(192, 132, 252, 0.75);
       transform: translateY(-3px);
-      box-shadow: 0 10px 35px rgba(192, 132, 252, 0.5);
+      box-shadow: 0 10px 35px rgba(192, 132, 252, 0.55);
     }
   </style>
 </head>
@@ -298,12 +341,11 @@
 
   <video autoplay muted loop playsinline id="bg-video">
     <source src="{{ url_for('static', filename='background.mp4') }}" type="video/mp4">
-    Your browser does not support HTML5 video.
   </video>
 
   <header>
     <a href="/" class="brand">
-      MaxyEU
+      <span class="brand-maxy">Maxy</span><span class="brand-eu">EU</span>
     </a>
     <nav>
       <a href="/app">Processor Tool</a>
@@ -313,37 +355,41 @@
 
   <main>
     <div class="hero-card">
-      <div>
-        <div class="profile-header">
-          <div class="avatar-wrapper">
-            <img src="{{ url_for('static', filename='avatar.jpg') }}" alt="Avatar" class="avatar-img" onerror="this.src='https://via.placeholder.com/80/121318/c084fc?text=Maxy'">
+      <div class="card-overlay"></div>
+
+      <div class="hero-card-content">
+        <div>
+          <div class="profile-header">
+            <div class="avatar-wrapper">
+              <img src="{{ url_for('static', filename='avatar.jpg') }}" alt="Avatar" class="avatar-img" onerror="this.src='https://via.placeholder.com/80/121318/c084fc?text=Maxy'">
+            </div>
+            <h1 class="profile-name">
+              <span class="name-maxy">Maxy</span><span class="name-eu">EU</span>
+            </h1>
           </div>
-          <h1 class="profile-name">
-            MaxyEU <span style="font-size: 1.2rem; color: #64748b; font-weight: 400; text-shadow: none; filter: none;">IT</span>
-          </h1>
+
+          <p class="profile-bio">
+            Welcome to my <strong class="text-violet">Tiktok Optimizer</strong> follow me on this links below, Thank you.
+          </p>
+
+          <div class="status-badge">
+            <span class="status-dot"></span> All services are online
+          </div>
+
+          <div class="social-links">
+            <a href="#" class="social-btn">⚙️ GitHub</a>
+            <a href="#" class="social-btn">▶ YouTube</a>
+            <a href="#" class="social-btn">🎵 TikTok</a>
+            <a href="#" class="social-btn">💬 Discord</a>
+          </div>
         </div>
 
-        <p class="profile-bio">
-          Welcome to my <strong class="text-violet">Tiktok Optimizer</strong> follow me on this links below, Thank you.
-        </p>
-
-        <div class="status-badge">
-          <span class="status-dot"></span> All services are online
+        <div class="preview-box">
+          <video autoplay muted loop playsinline class="preview-video">
+            <source src="{{ url_for('static', filename='feature-preview.mp4') }}" type="video/mp4">
+            📷 Preview Visual
+          </video>
         </div>
-
-        <div class="social-links">
-          <a href="#" class="social-btn">⚙️ GitHub</a>
-          <a href="#" class="social-btn">▶ YouTube</a>
-          <a href="#" class="social-btn">🎵 TikTok</a>
-          <a href="#" class="social-btn">💬 Discord</a>
-        </div>
-      </div>
-
-      <div class="preview-box">
-        <video autoplay muted loop playsinline class="preview-video">
-          <source src="{{ url_for('static', filename='feature-preview.mp4') }}" type="video/mp4">
-          📷 Preview Visual
-        </video>
       </div>
     </div>
 
