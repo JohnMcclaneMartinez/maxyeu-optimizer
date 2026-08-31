@@ -1,7 +1,7 @@
 import os
 import subprocess
 import traceback
-import imageio_ffmpeg  # <-- Import imageio_ffmpeg
+import imageio_ffmpeg
 from flask import Flask, render_template, request, jsonify, send_from_directory, url_for
 
 app = Flask(__name__)
@@ -19,7 +19,7 @@ def index():
 def optimize():
     if 'video' not in request.files:
         return jsonify({'success': False, 'error': 'No video file provided'}), 400
-    
+
     file = request.files['video']
     if file.filename == '':
         return jsonify({'success': False, 'error': 'No selected file'}), 400
@@ -33,10 +33,10 @@ def optimize():
     output_filename = f"optimized_{file.filename}"
     output_path = os.path.join(OUTPUT_FOLDER, output_filename)
 
-    # Get the exact path to the bundled FFmpeg binary
+    # Get the path to the bundled FFmpeg binary
     ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
 
-    # Build FFmpeg command using the imageio binary
+    # Build FFmpeg command using imageio binary
     ffmpeg_cmd = [ffmpeg_exe, '-y', '-i', input_path]
 
     if method == '720p60':
@@ -53,7 +53,7 @@ def optimize():
 
     try:
         subprocess.run(ffmpeg_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
-        
+
         if os.path.exists(input_path):
             os.remove(input_path)
 
