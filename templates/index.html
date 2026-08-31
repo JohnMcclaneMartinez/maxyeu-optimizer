@@ -4,118 +4,490 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MaxyEU OPTIMIZER</title>
-
+    
+    <!-- Browser Tab Favicon -->
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.png') }}">
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <script src="{{ url_for('static', filename='main.js') }}" defer></script>
+    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mp4box@0.5.2/dist/mp4box.all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mp4-muxer@5.1.0/build/mp4-muxer.min.js"></script>
+
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(rgba(10, 8, 15, 0.75), rgba(10, 8, 15, 0.75)), url("{{ url_for('static', filename='bg.jpg') }}") no-repeat center center fixed;
+            background-size: cover;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px 20px 50px 20px;
+            min-height: 100vh;
+        }
+
+        .top-navbar {
+            max-width: 1000px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+        }
+        .brand-logo {
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: 1px;
+            color: #ffffff;
+            text-shadow: 0 0 12px rgba(181, 126, 220, 0.6);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .brand-logo span { color: #b57edc; }
+
+        .main-container { width: 100%; max-width: 820px; margin: 0 auto; }
+        .header-section { text-align: center; margin-bottom: 25px; }
+        .header-title { font-size: 42px; font-weight: 800; margin: 0 0 8px 0; letter-spacing: -0.5px; }
+        .header-subtitle { color: #a3a3bd; font-size: 15px; margin: 0; }
+
+        .step-indicator-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 30px auto 35px auto;
+            max-width: 600px;
+            position: relative;
+        }
+        .step-indicator-bar::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 40px; right: 40px;
+            height: 1px;
+            background: #2b263a;
+            z-index: 1;
+        }
+        .step-node {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #110e1a;
+            padding: 0 10px;
+            z-index: 2;
+            color: #7b7891;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .step-node.active { color: #ffffff; }
+        .step-badge {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            background: #1f1a2b;
+            color: #88829b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: bold;
+            border: 1px solid #3b334d;
+        }
+        .step-node.active .step-badge {
+            background: #b57edc;
+            color: #000000;
+            border-color: #b57edc;
+            box-shadow: 0 0 10px rgba(181, 126, 220, 0.4);
+        }
+
+        .content-card {
+            background: rgba(18, 15, 26, 0.92);
+            border: 1px solid rgba(181, 126, 220, 0.18);
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+        }
+
+        .section-header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+        .section-number {
+            background: #b57edc;
+            color: #000;
+            width: 32px; height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 16px;
+            box-shadow: 0 0 8px rgba(181, 126, 220, 0.4);
+        }
+        .section-title { font-size: 20px; font-weight: 700; margin: 0; }
+        .section-desc { font-size: 13px; color: #928fa8; margin: 2px 0 0 0; }
+
+        .upload-dropzone {
+            border: 1px dashed rgba(181, 126, 220, 0.5);
+            border-radius: 12px;
+            padding: 45px 20px;
+            text-align: center;
+            background: rgba(28, 22, 40, 0.4);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .upload-dropzone:hover { border-color: #b57edc; background: rgba(181, 126, 220, 0.08); }
+        .plus-icon {
+            width: 44px; height: 44px;
+            background: #b57edc;
+            color: #000;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin: 0 auto 12px auto;
+            box-shadow: 0 0 10px rgba(181, 126, 220, 0.3);
+        }
+        .select-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+        .select-sub { font-size: 12px; color: #7d7894; }
+        #video-input { display: none; }
+
+        .file-preview {
+            display: none;
+            background: rgba(28, 22, 40, 0.8);
+            border: 1px solid #3d3353;
+            border-radius: 10px;
+            padding: 14px 18px;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+        .file-info { display: flex; align-items: center; gap: 12px; }
+        .file-name { font-size: 14px; font-weight: 600; color: #ffffff; word-break: break-all; }
+        .change-btn {
+            background: #2a2238;
+            border: 1px solid #4a3c63;
+            color: #d2c8e6;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .options-group { display: flex; flex-direction: column; gap: 14px; margin-top: 15px; }
+        .option-card {
+            border: 1px solid #2e263d;
+            background: rgba(22, 18, 31, 0.7);
+            border-radius: 12px;
+            padding: 18px;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .option-card.selected {
+            border-color: #b57edc;
+            background: rgba(181, 126, 220, 0.05);
+            box-shadow: 0 0 15px rgba(181, 126, 220, 0.15);
+        }
+        .option-card input[type="radio"],
+        .option-card input[type="checkbox"] {
+            margin-top: 4px;
+            accent-color: #b57edc;
+            width: 18px; height: 18px;
+        }
+        .option-content { flex: 1; }
+        .option-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 10px; }
+        .recommended-badge { background: #b57edc; color: #000; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 4px; }
+        .optional-badge { background: rgba(181, 126, 220, 0.15); color: #b57edc; border: 1px solid #b57edc; font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 4px; }
+        .option-desc { font-size: 13px; color: #928fa8; margin: 0; line-height: 1.4; }
+
+        .submit-btn {
+            width: 100%;
+            background: #b57edc;
+            color: #000000;
+            border: none;
+            padding: 16px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            margin-top: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 0 15px rgba(181, 126, 220, 0.3);
+            transition: transform 0.1s ease, background-color 0.2s ease;
+        }
+        .submit-btn:hover { background: #9f62c8; }
+        .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .progress-box {
+            display: none;
+            margin-top: 25px;
+            background: #14101e;
+            border: 1px solid #3b3050;
+            border-radius: 10px;
+            padding: 18px;
+        }
+        .progress-status { font-size: 13px; color: #b57edc; font-weight: 700; margin-bottom: 10px; }
+        .progress-track {
+            width: 100%; height: 12px;
+            background: #0a0810;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid #2d233e;
+        }
+        .progress-fill {
+            height: 100%; width: 0%;
+            background: linear-gradient(90deg, #9f62c8, #b57edc);
+            transition: width 0.3s ease;
+        }
+
+        .download-card {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(181, 126, 220, 0.08);
+            border: 1px solid #b57edc;
+            border-radius: 12px;
+            text-align: center;
+        }
+        .download-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 14px 28px;
+            background: #b57edc;
+            color: #000;
+            text-decoration: none;
+            font-weight: 800;
+            border-radius: 8px;
+            box-shadow: 0 0 12px rgba(181, 126, 220, 0.4);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(8, 6, 12, 0.88);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+        .modal-content {
+            background: #14101e;
+            border: 1px solid #3b3050;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 520px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+        }
+        .modal-subtitle { font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #b57edc; margin-bottom: 6px; }
+        .modal-title { font-size: 26px; font-weight: 800; margin: 0 0 10px 0; }
+        .modal-desc { font-size: 13px; color: #928fa8; line-height: 1.5; margin-bottom: 20px; }
+        .downscale-option {
+            border: 1px solid #2d253f;
+            background: #1a1526;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+        .downscale-option.highlight { border-color: #b57edc; background: rgba(181, 126, 220, 0.06); }
+        .downscale-option:hover { transform: translateY(-2px); border-color: #b57edc; }
+        .badge-tag { background: #b57edc; color: #000; font-size: 9px; font-weight: 900; padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 8px; }
+        .option-header-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+        .option-subtext { font-size: 12px; color: #8c88a3; margin: 0 0 10px 0; }
+        .time-pill { background: rgba(181, 126, 220, 0.15); color: #d8b8f3; font-size: 11px; padding: 4px 10px; border-radius: 6px; display: inline-block; }
+        .cancel-btn { background: transparent; border: none; color: #7d7894; font-size: 13px; cursor: pointer; margin-top: 10px; width: 100%; text-align: center; }
+
+        .spinner-ring {
+            width: 48px; height: 48px;
+            border: 4px solid rgba(181, 126, 220, 0.15);
+            border-top: 4px solid #b57edc;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .status-tag { font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #b57edc; }
+        .render-title { font-size: 32px; font-weight: 800; margin: 8px 0; }
+        .render-sub { font-size: 14px; color: #928fa8; }
+    </style>
 </head>
 <body>
-    <div class="background-overlay"></div>
 
-    <div class="container">
-        <header class="header">
-            <h1 class="logo-title">MAXYEU OPTIMIZER</h1>
-            <p class="subtitle">Choose a video, pick a method, and download the finished file.</p>
-        </header>
+<div class="top-navbar">
+    <div class="brand-logo">MaxyEU <span>OPTIMIZER</span></div>
+</div>
 
-        <div class="stepper">
-            <div class="step active" id="step-node-1">
-                <span class="step-number">1</span>
-                <span class="step-label">Video</span>
-            </div>
-            <div class="step-line"></div>
-            <div class="step" id="step-node-2">
-                <span class="step-number">2</span>
-                <span class="step-label">Method</span>
-            </div>
-            <div class="step-line"></div>
-            <div class="step" id="step-node-3">
-                <span class="step-number">3</span>
-                <span class="step-label">Download</span>
-            </div>
+<div class="main-container">
+    <div class="header-section">
+        <h1 class="header-title">Upload Method</h1>
+        <p class="header-subtitle">Choose a video, pick a method, and download the finished file.</p>
+    </div>
+
+    <div class="step-indicator-bar">
+        <div class="step-node active" id="step-node-1">
+            <div class="step-badge" id="step-badge-1">1</div>
+            <span>Video</span>
         </div>
+        <div class="step-node" id="step-node-2">
+            <div class="step-badge" id="step-badge-2">2</div>
+            <span>Method</span>
+        </div>
+        <div class="step-node" id="step-node-3">
+            <div class="step-badge" id="step-badge-3">3</div>
+            <span>Download</span>
+        </div>
+    </div>
 
-        <div class="content-card">
-            <form id="optimizer-form" action="/optimize" method="POST" enctype="multipart/form-data">
-                
-                <div class="section-title">
-                    <span class="section-number">1</span>
-                    <h3>Choose your video</h3>
+    <div class="content-card">
+        <form id="optimizer-form" action="/optimize" method="POST" enctype="multipart/form-data">
+            
+            <div class="section-header">
+                <div class="section-number">1</div>
+                <div>
+                    <h2 class="section-title">Choose your video</h2>
+                    <p class="section-desc">Every common video format is supported.</p>
                 </div>
+            </div>
 
-                <input type="file" id="video-input" name="video" accept="video/*" style="display: none;" required>
+            <div class="upload-dropzone" id="dropzone">
+                <div class="plus-icon">+</div>
+                <div class="select-title">Select video</div>
+                <div class="select-sub">or drag and drop your file here</div>
+            </div>
 
-                <div id="dropzone" class="dropzone">
-                    <p>Click to select video file or drag and drop here</p>
+            <div class="file-preview" id="file-preview">
+                <div class="file-info">
+                    <span>🎬</span>
+                    <span class="file-name" id="file-name-text">filename.mp4</span>
                 </div>
+                <button type="button" class="change-btn" id="change-video-btn">Change video</button>
+            </div>
 
-                <div id="file-preview" class="file-preview" style="display: none;">
-                    <span id="file-name-text">Selected: video.mp4</span>
-                    <button type="button" id="change-video-btn" class="secondary-btn">Change Video</button>
+            <input type="file" name="video" id="video-input" accept="video/mp4,video/mkv,video/mov,video/avi,video/webm,video/*" required>
+
+            <div class="section-header" style="margin-top: 35px;">
+                <div class="section-number">2</div>
+                <div>
+                    <h2 class="section-title">Choose a method</h2>
+                    <p class="section-desc">Select the compression engine configuration for your target output.</p>
                 </div>
+            </div>
 
-                <div class="section-title" style="margin-top: 30px;">
-                    <span class="section-number">2</span>
-                    <h3>Choose a method</h3>
-                </div>
-
-                <div class="options-grid">
-                    <div class="option-card selected">
-                        <input type="radio" name="method" value="max_quality" checked style="display: none;">
-                        <div class="option-header">
-                            <strong>MAX QUALITY + FPS METHOD</strong>
-                            <span class="badge">RECOMMENDED</span>
+            <div class="options-group">
+                <label class="option-card selected">
+                    <input type="radio" name="method" value="max_quality" checked>
+                    <div class="option-content">
+                        <div class="option-title">
+                            MAX QUALITY + FPS METHOD
+                            <span class="recommended-badge">RECOMMENDED</span>
                         </div>
                         <p class="option-desc">Preserves maximum sharpness and quality at 1080p target resolution.</p>
                     </div>
+                </label>
 
-                    <div class="option-card">
-                        <input type="radio" name="method" value="fps_patch" style="display: none;">
-                        <div class="option-header">
-                            <strong>FPS Method</strong>
-                        </div>
+                <label class="option-card">
+                    <input type="radio" name="method" value="fps_patch">
+                    <div class="option-content">
+                        <div class="option-title">FPS Method</div>
                         <p class="option-desc">Applies fast frame conversion and structural alignment without heavy filtering.</p>
                     </div>
+                </label>
 
-                    <div class="option-card">
-                        <input type="radio" name="method" value="720p60" style="display: none;">
-                        <div class="option-header">
-                            <strong>720p60 Method</strong>
-                        </div>
+                <label class="option-card">
+                    <input type="radio" name="method" value="720p60">
+                    <div class="option-content">
+                        <div class="option-title">720p60 Method</div>
                         <p class="option-desc">Scales down to 720p 60 FPS for low file weight and high upload speed.</p>
                     </div>
+                </label>
 
-                    <div class="checkbox-option">
-                        <label>
-                            <input type="checkbox" name="optimize_tiktok" value="yes">
-                            <span>Optimize file size for TikTok (Smaller upload size)</span>
-                        </label>
+                <div class="option-card" id="tiktok-card">
+                    <input type="checkbox" name="optimize_tiktok" id="optimize_tiktok_input" value="yes">
+                    <div class="option-content">
+                        <div class="option-title">
+                            Optimize file size for TikTok
+                            <span class="optional-badge">OPTIONAL</span>
+                        </div>
+                        <p class="option-desc">Makes large files smaller while keeping good visual quality. Leave this off unless you need a smaller upload. If the video needs to be resized, we handle this automatically.</p>
                     </div>
                 </div>
+            </div>
 
-                <button type="submit" id="submit-btn" class="primary-btn">Start processing &rarr;</button>
-            </form>
+            <button type="submit" class="submit-btn" id="submit-btn">
+                Start processing <span>→</span>
+            </button>
+        </form>
 
-            <div id="local-processing-view" style="display: none; text-align: center; padding: 40px 20px;">
-                <div class="spinner"></div>
-                <h3 id="local-status-title" style="margin-top: 20px; color: #fff;">Encoding Video on Cloud Server...</h3>
-                <p id="local-time-left" style="color: #aaa; font-size: 14px;">Uploading to server...</p>
-
-                <div class="progress-bar-container" style="background: rgba(255, 255, 255, 0.1); height: 10px; border-radius: 5px; margin: 25px auto 10px auto; width: 80%; overflow: hidden;">
-                    <div id="local-progress-fill" style="background: #b57edc; height: 100%; width: 0%; transition: width 0.2s ease;"></div>
-                </div>
-                <span id="local-progress-percent" style="font-size: 13px; color: #b57edc;">0%</span>
+        <div class="progress-box" id="progress-box">
+            <div class="progress-status" id="progress-status">Uploading Video... 0%</div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progress-fill"></div>
             </div>
         </div>
-    </div>
 
-    <div id="downscale-modal" class="modal-overlay" style="display: none;">
-        <div class="modal-card">
-            <h3>High Resolution Detected</h3>
-            <p>Your video is higher than 1080p. Server processing will optimize it to 1080p for standard output.</p>
-            <button type="button" id="cancel-modal-btn" class="primary-btn">Got it</button>
+        {% if download_file %}
+            <div class="download-card" id="download-section">
+                <h3 style="margin: 0; color: #b57edc;">Optimization Complete!</h3>
+                <p style="font-size: 13px; color: #aaa; margin: 5px 0 15px 0;">Your video file is optimized and ready.</p>
+                <a class="download-btn" href="{{ url_for('download_file', filename=download_file) }}">Download Optimized Video</a>
+            </div>
+        {% endif %}
+
+        <div id="downscale-modal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-subtitle">CHOOSE A DOWNSCALER</div>
+                <h2 class="modal-title">This video is above 1080p</h2>
+                <p class="modal-desc">
+                    TikTok works best at 1080p. Send this file directly to the cloud server for downscaling without tab crashes.
+                </p>
+
+                <div class="downscale-option highlight" id="opt-gpu" onclick="submitDirectly()">
+                    <span class="badge-tag">RECOMMENDED · CLOUD DOWNSCALER</span>
+                    <div class="option-header-title">Server Side High-Speed Downscaler</div>
+                    <p class="option-subtext">Processes on Railway server using native hardware acceleration.</p>
+                    <div class="time-pill">Fastest processing time</div>
+                </div>
+
+                <div class="downscale-option" id="opt-cpu" onclick="submitDirectly()">
+                    <div class="option-header-title">Compatibility Server Downscaler</div>
+                    <p class="option-subtext">Safely downscales on the cloud using fallback software encoding.</p>
+                    <div class="time-pill">High compatibility</div>
+                </div>
+
+                <button type="button" class="cancel-btn" id="cancel-modal-btn">Cancel</button>
+            </div>
         </div>
+
+        <div id="local-processing-view" style="display: none; text-align: center; padding: 40px 20px;">
+            <div class="spinner-ring"></div>
+            <div class="status-tag">PROCESSING ON SERVER</div>
+            <h2 class="render-title">Encoding Video on Cloud Server</h2>
+            <p class="render-sub">Please wait while Railway processes your video.</p>
+
+            <div class="progress-track" style="max-width: 500px; margin: 25px auto;">
+                <div class="progress-fill" id="local-progress-fill" style="width: 0%;"></div>
+            </div>
+            <div class="progress-percent" id="local-progress-percent" style="font-weight: 800; color: #b57edc; margin-top: 5px;">0%</div>
+
+            <div style="margin-top: 15px;">
+                <span id="local-time-left" class="time-pill">Processing...</span>
+            </div>
+        </div>
+
     </div>
+</div>
+
+<script>
+    function submitDirectly() {
+        document.getElementById('downscale-modal').style.display = 'none';
+        document.getElementById('optimizer-form').submit();
+    }
+</script>
+<script src="{{ url_for('static', filename='main.js') }}"></script>
 </body>
 </html>
