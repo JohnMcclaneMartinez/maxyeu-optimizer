@@ -58,14 +58,21 @@
       backdrop-filter: blur(8px);
     }
 
+    /* Updated Top-Left Brand Name Styling */
     .brand {
       display: flex;
       align-items: center;
       gap: 10px;
-      font-size: 1.5rem;
+      font-size: 2.2rem;
       font-weight: 800;
-      color: #ffffff;
+      color: #c084fc;
       text-decoration: none;
+      animation: pulseGlow 2.5s infinite ease-in-out;
+      transition: transform 0.3s ease;
+    }
+
+    .brand:hover {
+      transform: scale(1.02);
     }
 
     nav {
@@ -297,7 +304,7 @@
         </div>
 
         <p class="profile-bio">
-          Welcome to my  <strong class="text-violet">Tiktok Optimizer</strong> follow me on this links below, Thank you.
+          Welcome to my <strong class="text-violet">Tiktok Optimizer</strong> follow me on this links below, Thank you.
         </p>
 
         <div class="status-badge">
