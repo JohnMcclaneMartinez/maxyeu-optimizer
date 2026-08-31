@@ -10,12 +10,12 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
     body {
-      background-color: #0b0c10;
-      color: #e0e0e0;
+      background-color: #050508;
+      color: #f5f5f7;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -32,7 +32,7 @@
       height: auto;
       z-index: -2;
       object-fit: cover;
-      filter: brightness(0.4);
+      filter: brightness(0.5);
     }
 
     /* Floating / Glow Animations */
@@ -62,20 +62,16 @@
       text-shadow: 0 0 12px rgba(192, 132, 252, 0.5);
     }
 
-    .text-deep-violet {
-      color: #8b5cf6;
-      text-shadow: 0 0 14px rgba(139, 92, 246, 0.6);
-    }
-
     /* Navigation Header */
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       padding: 20px 80px;
-      background: rgba(11, 12, 16, 0.6);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: rgba(10, 10, 14, 0.45);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
     /* Top-Left Brand Name Styling */
@@ -109,9 +105,10 @@
     }
 
     nav a {
-      color: #94a3b8;
+      color: #a1a1aa;
       text-decoration: none;
       font-size: 0.95rem;
+      font-weight: 500;
       transition: color 0.2s ease;
     }
 
@@ -127,41 +124,25 @@
       width: 100%;
     }
 
-    /* Hero Profile Card with Static Image Background */
+    /* iOS Dark Acrylic Frosted Glass Profile Hero Card */
     .hero-card {
       position: relative;
-      border: 1px solid rgba(168, 85, 247, 0.35);
-      border-radius: 16px;
+      background: rgba(15, 15, 20, 0.65);
+      backdrop-filter: blur(25px) saturate(180%);
+      -webkit-backdrop-filter: blur(25px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-top: 1px solid rgba(255, 255, 255, 0.2); /* iOS light edge highlight */
+      border-radius: 24px;
       padding: 40px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      overflow: hidden;
       margin-bottom: 40px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
-      /* Static Image Background */
-      background-image: url("{{ url_for('static', filename='card-bg.jpg') }}");
-      background-size: cover;
-      background-position: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
     }
 
-    /* Glass Overlay over Card Image */
-    .card-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(18, 19, 24, 0.65);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      z-index: 1;
-    }
-
-    /* Card Content Above Overlay */
+    /* Card Layout Container */
     .hero-card-content {
-      position: relative;
-      z-index: 2;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -210,6 +191,7 @@
     .profile-name {
       font-size: 2.2rem;
       font-weight: 800;
+      letter-spacing: -0.5px;
       animation: pulseGlow 2.5s infinite ease-in-out;
     }
 
@@ -222,25 +204,25 @@
     }
 
     .profile-bio {
-      color: #e2e8f0;
+      color: #e4e4e7;
       max-width: 540px;
       line-height: 1.6;
       margin-bottom: 20px;
-      text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
     }
 
-    /* Status indicator */
+    /* Status Indicator */
     .status-badge {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: rgba(34, 197, 94, 0.15);
-      backdrop-filter: blur(8px);
-      border: 1px solid rgba(34, 197, 94, 0.4);
+      background: rgba(34, 197, 94, 0.12);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(34, 197, 94, 0.35);
       color: #4ade80;
       padding: 6px 14px;
       border-radius: 20px;
       font-size: 0.85rem;
+      font-weight: 500;
       margin-bottom: 24px;
     }
 
@@ -252,7 +234,7 @@
       box-shadow: 0 0 8px #4ade80;
     }
 
-    /* Glassmorphism Social Links */
+    /* iOS Glassmorphism Social Links */
     .social-links {
       display: flex;
       gap: 12px;
@@ -263,24 +245,24 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      background: rgba(192, 132, 252, 0.15);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      color: #f3e8ff;
-      border: 1px solid rgba(192, 132, 252, 0.3);
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
       padding: 8px 18px;
       border-radius: 20px;
       text-decoration: none;
       font-size: 0.88rem;
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      font-weight: 500;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     .social-btn:hover {
-      background: rgba(192, 132, 252, 0.28);
+      background: rgba(192, 132, 252, 0.25);
       border-color: rgba(192, 132, 252, 0.6);
-      color: #ffffff;
-      box-shadow: 0 0 16px rgba(192, 132, 252, 0.5);
+      box-shadow: 0 0 20px rgba(192, 132, 252, 0.4);
       transform: translateY(-2px);
     }
 
@@ -288,23 +270,24 @@
     .preview-box {
       width: 260px;
       height: 160px;
-      background-color: rgba(26, 27, 34, 0.6);
+      background-color: rgba(0, 0, 0, 0.4);
       border: 1px dashed rgba(192, 132, 252, 0.4);
-      border-radius: 12px;
+      border-radius: 16px;
       display: flex;
       justify-content: center;
       align-items: center;
       overflow: hidden;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
     }
 
     .preview-video {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      border-radius: 12px;
+      border-radius: 16px;
     }
 
-    /* Main Action Button */
+    /* iOS Primary Glass Action Button */
     .action-container {
       display: flex;
       justify-content: center;
@@ -315,25 +298,26 @@
       display: inline-flex;
       align-items: center;
       gap: 12px;
-      background: rgba(168, 85, 247, 0.28);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      background: rgba(168, 85, 247, 0.3);
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
       color: #ffffff;
       border: 1px solid rgba(192, 132, 252, 0.45);
+      border-top: 1px solid rgba(255, 255, 255, 0.3);
       font-weight: 700;
       font-size: 1.1rem;
       padding: 16px 36px;
-      border-radius: 14px;
+      border-radius: 18px;
       text-decoration: none;
       transition: all 0.3s ease;
-      box-shadow: 0 8px 25px rgba(168, 85, 247, 0.3);
+      box-shadow: 0 10px 30px rgba(168, 85, 247, 0.3);
     }
 
     .main-tool-btn:hover {
-      background: rgba(192, 132, 252, 0.42);
-      border-color: rgba(192, 132, 252, 0.75);
+      background: rgba(192, 132, 252, 0.45);
+      border-color: rgba(192, 132, 252, 0.8);
       transform: translateY(-3px);
-      box-shadow: 0 10px 35px rgba(192, 132, 252, 0.55);
+      box-shadow: 0 14px 40px rgba(192, 132, 252, 0.55);
     }
   </style>
 </head>
@@ -355,8 +339,6 @@
 
   <main>
     <div class="hero-card">
-      <div class="card-overlay"></div>
-
       <div class="hero-card-content">
         <div>
           <div class="profile-header">
