@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MaxyEU OPTIMIZER</title>
+    <style>
+        /* Base Reset & Typography */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            position: relative;
+            min-height: 100vh;
+            color: #ffffff;
+            background: #000000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 40px 20px;
+            overflow-x: hidden;
+        }
+
+        /* Video Background Styling */
+        .video-background-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            z-index: -2;
+        }
+
+        .bg-video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+        }
+
+        .video-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(11, 11, 15, 0.75); /* Dark tint to match your theme and keep UI legible */
+            z-index: -1;
+        }
+
+        /* App Wrapper / Header */
+        .main-container {
+            width: 100%;
+            max-width: 750px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 1;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+            text-align: center;
+            color: #a855f7;
+            text-shadow: 0 0 14px rgba(168, 85, 247, 0.22);
+            animation: titlePulse 3.2s ease-in-out infinite;
+        }
+
+        @keyframes titlePulse {
+            0%, 100% {
+                text-shadow: 0 0 10px rgba(168, 85, 247, 0.16);
+            }
+            50% {
+                text-shadow: 0 0 18px rgba(168, 85, 247, 0.34);
+            }
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            color: #a1a1aa;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        /* Stepper Header Bar */
+        .stepper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 30px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #71717a;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .step-item.active {
+            color: #ffffff;
+        }
+
+        .step-number {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background-color: #27272a;
+            color: #a1a1aa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .step-item.active .step-number {
+            background-color: #a855f7;
+            color: #000000;
+        }
+
+        .step-line {
+            width: 40px;
+            height: 1px;
+            background-color: #3f3f46;
+        }
+
+        /* Glassmorphism Card Container */
+        .card-panel {
+            width: 100%;
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(255, 255, 255, 0.085),
+                    rgba(255, 255, 255, 0.035)
+                );
+            -webkit-backdrop-filter: blur(28px) saturate(160%);
+            backdrop-filter: blur(28px) saturate(160%);
+            border: 1px solid rgba(255, 255, 255, 0.13);
+            border-radius: 24px;
+            padding: 32px;
+            box-shadow:
+                0 24px 70px rgba(0, 0, 0, 0.58),
+                inset 0 1px 0 rgba(255, 255, 255, 0.08),
+                inset 0 -1px 0 rgba(255, 255, 255, 0.025);
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        /* Section Block */
+        .section-block {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-badge {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            background-color: #a855f7;
+            color: #000000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .section-desc {
+            font-size: 0.85rem;
+            color: #a1a1aa;
+            margin-left: 34px;
+        }
+
+        /* Upload Dropzone */
+        .upload-dropzone {
+            margin-left: 34px;
+            border-radius: 14px;
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(255, 255, 255, 0.055),
+                    rgba(255, 255, 255, 0.018)
+                );
+            -webkit-backdrop-filter: blur(20px) saturate(150%);
+            backdrop-filter: blur(20px) saturate(150%);
+            border: 2px dashed rgba(168, 85, 247, 0.32);
+            padding: 36px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .upload-dropzone:hover {
+            border-color: rgba(192, 132, 252, 0.7);
+            background: rgba(24, 24, 32, 0.8);
+        }
+
+        .upload-icon-box {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background-color: rgba(192, 132, 252, 0.15);
+            color: #a855f7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        .upload-text {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .upload-subtext {
+            font-size: 0.78rem;
+            color: #71717a;
+        }
+
+        /* Method Selection Options */
+        .methods-list {
+            margin-left: 34px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .method-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(255, 255, 255, 0.055),
+                    rgba(255, 255, 255, 0.018)
+                );
+            -webkit-backdrop-filter: blur(18px) saturate(150%);
+            backdrop-filter: blur(18px) saturate(150%);
+            border: 1px solid rgba(255, 255, 255, 0.095);
+            border-radius: 14px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .method-option:hover {
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(168, 85, 247, 0.10),
+                    rgba(255, 255, 255, 0.035)
+                );
+            border-color: rgba(168, 85, 247, 0.42);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        }
+
+        .method-option input[type="radio"] {
+            margin-top: 3px;
+            accent-color: #a855f7;
+            cursor: pointer;
+        }
+
+        .method-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .method-title-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .method-name {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .recommended-badge {
+            background-color: rgba(192, 132, 252, 0.2);
+            color: #d8b4fe;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .method-desc {
+            font-size: 0.8rem;
+            color: #a1a1aa;
+            line-height: 1.4;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 28px 14px;
+            }
+
+            .card-panel {
+                padding: 22px;
+                border-radius: 20px;
+            }
+
+            .upload-dropzone,
+            .methods-list,
+            .section-desc {
+                margin-left: 0;
+            }
+
+            h1 {
+                font-size: 1.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Immersive Video Background -->
+    <div class="video-background-container">
+        <!-- Be sure to update the src attribute to point to your actual background video file -->
+        <video autoplay muted loop playsinline class="bg-video">
+            <source src="background.mp4" type="video/mp4">
+            Your browser does not support HTML5 video.
+        </video>
+    </div>
+    <div class="video-overlay"></div>
+
+    <!-- Main Content Area -->
+    <div class="main-container">
+        <h1>Upload Method</h1>
+        <p class="subtitle">Choose a video, pick a method, and download the finished file.</p>
+
+        <!-- Stepper -->
+        <div class="stepper">
+            <div class="step-item active">
+                <div class="step-number">1</div>
+                <span>Video</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item">
+                <div class="step-number">2</div>
+                <span>Method</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step-item">
+                <div class="step-number">3</div>
+                <span>Download</span>
+            </div>
+        </div>
+
+        <!-- Glassmorphic Card Container -->
+        <div class="card-panel">
+            
+            <!-- Step 1: Choose Video -->
+            <div class="section-block">
+                <div class="section-header">
+                    <div class="section-badge">1</div>
+                    <div class="section-title">Choose your video</div>
+                </div>
+                <div class="section-desc">Every common video format is supported.</div>
+                
+                <div class="upload-dropzone">
+                    <div class="upload-icon-box">+</div>
+                    <div class="upload-text">Select video</div>
+                    <div class="upload-subtext">or drag and drop your file here</div>
+                </div>
+            </div>
+
+            <!-- Step 2: Choose Method -->
+            <div class="section-block">
+                <div class="section-header">
+                    <div class="section-badge">2</div>
+                    <div class="section-title">Choose a method</div>
+                </div>
+                <div class="section-desc">Select the compression engine configuration for your target output.</div>
+
+                <div class="methods-list">
+                    <!-- Option 1 -->
+                    <label class="method-option">
+                        <input type="radio" name="compression_method" checked>
+                        <div class="method-info">
+                            <div class="method-title-row">
+                                <span class="method-name">MAX QUALITY + FPS METHOD</span>
+                                <span class="recommended-badge">Recommended</span>
+                            </div>
+                            <span class="method-desc">Preserves maximum sharpness and quality at 1080p target resolution.</span>
+                        </div>
+                    </label>
+
+                    <!-- Option 2 -->
+                    <label class="method-option">
+                        <input type="radio" name="compression_method">
+                        <div class="method-info">
+                            <div class="method-title-row">
+                                <span class="method-name">FPS Method</span>
+                            </div>
+                            <span class="method-desc">Applies fast frame conversion and structural alignment without heavy filtering.</span>
+                        </div>
+                    </label>
+
+                    <!-- Option 3 -->
+                    <label class="method-option">
+                        <input type="radio" name="compression_method">
+                        <div class="method-info">
+                            <div class="method-title-row">
+                                <span class="method-name">720p60 Method</span>
+                            </div>
+                            <span class="method-desc">Scales down to 720p 60 FPS for low file weight and high upload speed.</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</body>
+</html>
