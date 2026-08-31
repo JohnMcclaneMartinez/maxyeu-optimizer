@@ -24,9 +24,6 @@ def optimize():
     if file.filename == '':
         return jsonify({'success': False, 'error': 'No selected file'}), 400
 
-    method = request.form.get('method', 'max_quality')
-    optimize_tiktok = request.form.get('optimize_tiktok')
-
     input_path = os.path.join(UPLOAD_FOLDER, file.filename)
     file.save(input_path)
 
@@ -35,46 +32,32 @@ def optimize():
 
     ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
 
-    # Build video filter parameter
-    if method == '720p60':
-        vf_param = 'scale=trunc(iw/2)*2:720,fps=60'
-    elif method == 'fps_patch':
-        vf_param = 'fps=60'
-    else:  # max_quality
-        vf_param = 'scale=trunc(iw/2)*2:min(1080\,ih)'
-
-    # Construct clean FFmpeg command sequence
+    # Stripped-down baseline command (no complex filter chains)
     ffmpeg_cmd = [
         ffmpeg_exe, '-y',
         '-i', input_path,
-        '-vf', vf_param,
         '-c:v', 'libx264',
-        '-preset', 'fast',
-        '-crf', '22',
-        '-pix_fmt', 'yuv420p'
+        '-preset', 'ultrafast',
+        '-crf', '23',
+        '-pix_fmt', 'yuv420p',
+        '-c:a', 'aac',
+        output_path
     ]
 
-    # Insert TikTok bitrate capping inline before audio flags
-    if optimize_tiktok == 'yes':
-        ffmpeg_cmd.extend(['-maxrate', '12M', '-bufsize', '16M'])
-
-    # Audio settings & target file path
-    ffmpeg_cmd.extend([
-        '-c:a', 'aac',
-        '-b:a', '192k',
-        '-ac', '2',
-        output_path
-    ])
-
     try:
-        subprocess.run(
+        # Run FFmpeg and capture standard error output
+        res = subprocess.run(
             ffmpeg_cmd,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-            text=True,
-            check=True
+            text=True
         )
-        
+
+        if res.returncode != 0:
+            # Print the FULL last 10 lines of stderr to pinpoint the exact failure line
+            err_log = "\n".join(res.stderr.strip().split('\n')[-10:])
+            raise Exception(f"FFmpeg exit code {res.returncode}:\n{err_log}")
+
         if os.path.exists(input_path):
             os.remove(input_path)
 
@@ -83,18 +66,10 @@ def optimize():
             'download_url': url_for('download_file', filename=output_filename)
         })
 
-    except subprocess.CalledProcessError as e:
-        # Return full raw stderr so we can pinpoint any remaining flag issues
-        raw_error = e.stderr.strip() if e.stderr else "Unknown FFmpeg error"
-        
-        if os.path.exists(input_path):
-            os.remove(input_path)
-            
-        return jsonify({'success': False, 'error': f"FFmpeg detail: {raw_error[-300:]}"}), 500
-
     except Exception as e:
         if os.path.exists(input_path):
             os.remove(input_path)
+        # Display the real error directly on the browser JSON page
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/download/<filename>')
