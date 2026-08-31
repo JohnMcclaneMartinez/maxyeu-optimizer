@@ -35,28 +35,29 @@ def optimize():
 
     ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
 
-    # Configure low-memory resolution limits
+    # Dynamic scaling based on selected method
     if method == '720p60':
         scale_filter = 'scale=trunc(iw/2)*2:720,fps=60'
     elif method == 'fps_patch':
         scale_filter = 'fps=60'
-    else:  # max_quality capped at 1080p
-        scale_filter = 'scale=trunc(iw/2)*2:min(1080\,ih)'
+    else:  # max_quality capped to 720p maximum to prevent OOM kills on Railway
+        scale_filter = 'scale=trunc(iw/2)*2:720'
 
-    # Memory-safe FFmpeg configuration
+    # Strict low-RAM FFmpeg flags to avoid Railway SIGKILL (-9)
     ffmpeg_cmd = [
         ffmpeg_exe, '-y',
-        '-threads', '2',                # Cap threads to prevent RAM spikes
+        '-threads', '1',               # Single thread caps RAM overhead
         '-i', input_path,
         '-vf', scale_filter,
         '-c:v', 'libx264',
-        '-preset', 'ultrafast',        # Ultrafast uses the least RAM
-        '-crf', '24',                   # Slightly lighter compression
+        '-preset', 'ultrafast',        # Lowest RAM usage profile
+        '-tune', 'fastdecode',
+        '-crf', '26',                   # Lightweight compression profile
         '-pix_fmt', 'yuv420p'
     ]
 
     if optimize_tiktok == 'yes':
-        ffmpeg_cmd.extend(['-maxrate', '8M', '-bufsize', '8M'])
+        ffmpeg_cmd.extend(['-maxrate', '6M', '-bufsize', '6M'])
 
     ffmpeg_cmd.extend([
         '-c:a', 'aac',
@@ -74,7 +75,7 @@ def optimize():
         )
 
         if res.returncode != 0:
-            err_log = "\n".join(res.stderr.strip().split('\n')[-5:])
+            err_log = "\n".join(res.stderr.strip().split('\n')[-3:])
             raise Exception(f"FFmpeg error code {res.returncode}: {err_log}")
 
         if os.path.exists(input_path):
