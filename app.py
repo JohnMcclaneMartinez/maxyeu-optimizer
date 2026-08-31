@@ -25,15 +25,8 @@ def allowed_file(filename):
 
 @app.route('/')
 def index():
-    return '''
-    <!doctype html>
-    <title>Maxyeu Video Optimizer</title>
-    <h2>Upload Video to Optimize</h2>
-    <form method=post enctype=multipart/form-data action="/optimize">
-      <input type=file name=file required>
-      <input type=submit value=Optimize>
-    </form>
-    '''
+    # Renders your custom web template from templates/index.html
+    return render_template('index.html')
 
 
 @app.route('/optimize', methods=['POST'])
