@@ -21,6 +21,20 @@
       flex-direction: column;
     }
 
+    /* Live Video Background Styling */
+    #bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      min-width: 100%;
+      min-height: 100%;
+      width: auto;
+      height: auto;
+      z-index: -1;
+      object-fit: cover;
+      filter: brightness(0.5); /* Adjust opacity/brightness of the live background */
+    }
+
     /* Floating / Circling Light Glow Animations */
     @keyframes pulseGlow {
       0% {
@@ -54,11 +68,12 @@
       justify-content: space-between;
       align-items: center;
       padding: 20px 80px;
-      background: rgba(11, 12, 16, 0.8);
-      backdrop-filter: blur(8px);
+      background: rgba(11, 12, 16, 0.6);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
 
-    /* Updated Top-Left Brand Name Styling */
+    /* Top-Left Brand Name Styling */
     .brand {
       display: flex;
       align-items: center;
@@ -102,8 +117,9 @@
     /* Hero Profile Card */
     .hero-card {
       position: relative;
-      background-color: rgba(18, 19, 24, 0.75);
+      background-color: rgba(18, 19, 24, 0.65);
       backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(168, 85, 247, 0.25);
       border-radius: 16px;
       padding: 40px;
@@ -225,7 +241,7 @@
       transform: translateY(-2px);
     }
 
-    /* Preview Visual Placeholder */
+    /* Preview Video Box */
     .preview-box {
       width: 260px;
       height: 160px;
@@ -235,11 +251,10 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      color: #64748b;
-      font-size: 0.9rem;
+      overflow: hidden;
     }
 
-    .preview-box img {
+    .preview-video {
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -281,6 +296,11 @@
 </head>
 <body>
 
+  <video autoplay muted loop playsinline id="bg-video">
+    <source src="{{ url_for('static', filename='background.mp4') }}" type="video/mp4">
+    Your browser does not support HTML5 video.
+  </video>
+
   <header>
     <a href="/" class="brand">
       MaxyEU
@@ -320,7 +340,10 @@
       </div>
 
       <div class="preview-box">
-        <img src="{{ url_for('static', filename='feature-preview.jpg') }}" alt="Preview Visual" onerror="this.parentElement.innerHTML='📷 Preview Visual'">
+        <video autoplay muted loop playsinline class="preview-video">
+          <source src="{{ url_for('static', filename='feature-preview.mp4') }}" type="video/mp4">
+          📷 Preview Visual
+        </video>
       </div>
     </div>
 
