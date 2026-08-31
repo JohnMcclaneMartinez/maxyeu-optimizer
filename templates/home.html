@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>itzCrih - Portfolio & Tools</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #0b0b0e;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* Background Video Overlay */
+        #bg-video {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            min-width: 100%;
+            min-height: 100%;
+            z-index: -2;
+            object-fit: cover;
+            filter: brightness(0.35) contrast(1.1);
+        }
+
+        /* Star / Particles Overlay (Optional dark tint) */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(11, 11, 14, 0.6);
+            z-index: -1;
+        }
+
+        /* Navbar */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 8%;
+            background: rgba(11, 11, 14, 0.7);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffb703;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #a0a0ab;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: #ffffff;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Hero Banner Card */
+        .hero-card {
+            background: rgba(18, 18, 24, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(12px);
+            margin-bottom: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero-left {
+            max-width: 600px;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 2px solid #ffb703;
+            object-fit: cover;
+        }
+
+        .username-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .username-title span {
+            color: #ffb703;
+        }
+
+        .bio {
+            color: #a0a0ab;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            font-size: 1rem;
+        }
+
+        .bio bold {
+            color: #ffb703;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-bottom: 25px;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #22c55e;
+            border-radius: 50%;
+        }
+
+        .social-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .social-btn {
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+            padding: 8px 16px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s;
+        }
+
+        .social-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .hero-right img {
+            width: 260px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* Projects Section */
+        .section-title {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .project-card {
+            background: rgba(18, 18, 24, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(12px);
+            transition: transform 0.2s, border-color 0.2s;
+        }
+
+        .project-card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(255, 183, 3, 0.4);
+        }
+
+        .project-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .badge {
+            background: #ffb703;
+            color: #000;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 700;
+        }
+
+        .project-desc {
+            color: #a0a0ab;
+            font-size: 0.88rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .open-btn {
+            color: #ffb703;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .open-btn:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Background Video -->
+    <video autoplay loop muted playsinline id="bg-video">
+        <source src="/static/background.mp4" type="video/mp4">
+    </video>
+    <div class="overlay"></div>
+
+    <!-- Navigation -->
+    <nav>
+        <a href="/" class="logo"><i class="fa-solid fa-crown"></i> itzCrih</a>
+        <ul class="nav-links">
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="/app">Processor Tool</a></li>
+            <li><a href="#">Quality</a></li>
+            <li><a href="#">Status</a></li>
+        </ul>
+    </nav>
+
+    <!-- Content -->
+    <div class="container">
+        <!-- Hero Card -->
+        <div class="hero-card">
+            <div class="hero-left">
+                <div class="profile-header">
+                    <img src="/static/avatar.jpg" alt="Avatar" class="avatar">
+                    <div class="username-title">
+                        <i class="fa-solid fa-bolt" style="color:#ffb703;"></i> itzCrih 🇮🇹
+                    </div>
+                </div>
+                <p class="bio">
+                    Creative <b style="color:#ffb703;">Backend Developer</b> & Editor. Building video tools, APIs, and custom encoding workflows to avoid aggressive compression.
+                </p>
+                <div class="status-badge">
+                    <div class="status-dot"></div> All services are online
+                </div>
+                <div class="social-buttons">
+                    <a href="#" class="social-btn"><i class="fa-brands fa-github"></i> GitHub</a>
+                    <a href="#" class="social-btn"><i class="fa-brands fa-youtube"></i> YouTube</a>
+                    <a href="#" class="social-btn"><i class="fa-brands fa-tiktok"></i> TikTok</a>
+                    <a href="#" class="social-btn"><i class="fa-brands fa-spotify"></i> Spotify</a>
+                    <a href="#" class="social-btn"><i class="fa-brands fa-discord"></i> Discord</a>
+                </div>
+            </div>
+            <div class="hero-right">
+                <img src="/static/feature-preview.jpg" alt="Preview Visual">
+            </div>
+        </div>
+
+        <!-- Projects Grid -->
+        <div class="section-title" id="projects">
+            <i class="fa-solid fa-microchip" style="color:#ffb703;"></i> Projects
+        </div>
+        
+        <div class="projects-grid">
+            <!-- Video Processor Card -->
+            <div class="project-card">
+                <div class="project-title">
+                    itzCrih Method <span class="badge">Tool</span>
+                </div>
+                <p class="project-desc">
+                    TikTok upload method & video optimizer tool to bypass aggressive platform compression.
+                </p>
+                <a href="/app" class="open-btn">Open Processing Tool →</a>
+            </div>
+
+            <!-- Other Placeholder Cards -->
+            <div class="project-card">
+                <div class="project-title">itzStream <span class="badge">Public</span></div>
+                <p class="project-desc">Modern lightweight temporary video hosting platform.</p>
+                <a href="#" class="open-btn">Open →</a>
+            </div>
+
+            <div class="project-card">
+                <div class="project-title" style="color:#ffb703;">itzCrih Community</div>
+                <p class="project-desc">Official Discord server for updates and encoding support.</p>
+                <a href="#" class="open-btn">Join →</a>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
