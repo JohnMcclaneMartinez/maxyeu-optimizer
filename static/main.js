@@ -11,12 +11,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const cancelModalBtn = document.getElementById("cancel-modal-btn");
     const localProcessingView = document.getElementById("local-processing-view");
 
-    // UI elements inside local-processing-view
+    // Elements in local processing view
     const localProgressFill = document.getElementById("local-progress-fill");
     const localProgressPercent = document.getElementById("local-progress-percent");
     const localTimeLeft = document.getElementById("local-time-left");
 
-    // File Selection via Dropzone
+    // Step Node indicators
+    const stepNode1 = document.getElementById("step-node-1");
+    const stepNode2 = document.getElementById("step-node-2");
+    const stepNode3 = document.getElementById("step-node-3");
+
+    // Dropzone logic
     dropzone.addEventListener("click", () => videoInput.click());
 
     dropzone.addEventListener("dragover", (e) => {
@@ -46,6 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
         videoInput.value = "";
         filePreview.style.display = "none";
         dropzone.style.display = "block";
+        if (stepNode2) stepNode2.classList.remove("active");
     });
 
     function handleFileSelection() {
@@ -54,6 +60,8 @@ document.addEventListener("DOMContentLoaded", () => {
             fileNameText.textContent = file.name;
             dropzone.style.display = "none";
             filePreview.style.display = "flex";
+
+            if (stepNode2) stepNode2.classList.add("active");
 
             checkVideoResolution(file);
         }
@@ -77,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Radio option visual selection logic
+    // Radio card visual selector
     const optionCards = document.querySelectorAll(".option-card");
     optionCards.forEach((card) => {
         const radio = card.querySelector('input[type="radio"]');
@@ -90,7 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Handle Form Submission
+    // Handle AJAX Submission
     optimizerForm.addEventListener("submit", (e) => {
         if (!videoInput.files || videoInput.files.length === 0) {
             return;
@@ -98,12 +106,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         e.preventDefault();
 
-        // 1. Hide modal and main form
+        // 1. Hide modal and form, show loading screen
         downscaleModal.style.display = "none";
         optimizerForm.style.display = "none";
-
-        // 2. Reveal full loading screen with spinner and progress bar
         localProcessingView.style.display = "block";
+
+        // Reset status visuals
         localProgressFill.style.width = "0%";
         localProgressPercent.textContent = "0%";
         localTimeLeft.textContent = "Uploading to server...";
@@ -111,7 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const formData = new FormData(optimizerForm);
         const xhr = new XMLHttpRequest();
 
-        // 3. Track live upload progress directly inside the loading view
+        // 2. Track live upload progress
         xhr.upload.addEventListener("progress", (event) => {
             if (event.lengthComputable) {
                 const percentComplete = Math.round((event.loaded / event.total) * 100);
@@ -126,27 +134,61 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
+        // 3. Process completed server response
         xhr.onload = function () {
             if (xhr.status === 200) {
-                document.open();
-                document.write(xhr.responseText);
-                document.close();
+                try {
+                    const data = JSON.parse(xhr.responseText);
+
+                    if (data.success) {
+                        // Hide loading view
+                        localProcessingView.style.display = "none";
+
+                        // Activate Step 3 Badge
+                        if (stepNode3) stepNode3.classList.add("active");
+
+                        // Dynamically create or update download card
+                        let downloadSection = document.getElementById("download-section");
+                        if (!downloadSection) {
+                            downloadSection = document.createElement("div");
+                            downloadSection.id = "download-section";
+                            downloadSection.className = "download-card";
+                            document.querySelector(".content-card").appendChild(downloadSection);
+                        }
+
+                        downloadSection.innerHTML = `
+                            <h3 style="margin: 0; color: #b57edc;">Optimization Complete!</h3>
+                            <p style="font-size: 13px; color: #aaa; margin: 5px 0 15px 0;">Your video file is optimized and ready.</p>
+                            <a class="download-btn" href="${data.download_url}">Download Optimized Video</a>
+                        `;
+                        downloadSection.style.display = "block";
+
+                    } else {
+                        alert("Processing Error: " + (data.error || "Failed on server"));
+                        resetUI();
+                    }
+                } catch (err) {
+                    alert("Error parsing response from server.");
+                    resetUI();
+                }
             } else {
-                alert("An error occurred during video processing. Please try again.");
-                localProcessingView.style.display = "none";
-                optimizerForm.style.display = "block";
-                submitBtn.disabled = false;
+                alert("Server error occurred (" + xhr.status + "). Please try again.");
+                resetUI();
             }
         };
 
         xhr.onerror = function () {
-            alert("Network error occurred during upload.");
-            localProcessingView.style.display = "none";
-            optimizerForm.style.display = "block";
-            submitBtn.disabled = false;
+            alert("Network error during upload.");
+            resetUI();
         };
 
         xhr.open("POST", optimizerForm.action, true);
         xhr.send(formData);
     });
+
+    function resetUI() {
+        localProcessingView.style.display = "none";
+        optimizerForm.style.display = "block";
+        if (submitBtn) submitBtn.disabled = false;
+    }
 });
