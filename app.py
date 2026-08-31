@@ -35,37 +35,36 @@ def optimize():
 
     ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
 
-    # Base FFmpeg command with enlarged probesize for complex video containers
+    # Build video filter parameter
+    if method == '720p60':
+        vf_param = 'scale=trunc(iw/2)*2:720,fps=60'
+    elif method == 'fps_patch':
+        vf_param = 'fps=60'
+    else:  # max_quality
+        vf_param = 'scale=trunc(iw/2)*2:min(1080\,ih)'
+
+    # Construct clean FFmpeg command sequence
     ffmpeg_cmd = [
         ffmpeg_exe, '-y',
-        '-analyzeduration', '100M',
-        '-probesize', '100M',
-        '-i', input_path
-    ]
-
-    # Configure resolution scaling and frame rates safely
-    if method == '720p60':
-        ffmpeg_cmd.extend(['-vf', 'scale=trunc(iw/2)*2:720', '-r', '60'])
-    elif method == 'fps_patch':
-        ffmpeg_cmd.extend(['-r', '60'])
-    else:  # max_quality (1080p limit, preserving aspect ratio)
-        ffmpeg_cmd.extend(['-vf', 'scale=-2:1080'])
-
-    # Codecs and output parameters
-    ffmpeg_cmd.extend([
+        '-i', input_path,
+        '-vf', vf_param,
         '-c:v', 'libx264',
         '-preset', 'fast',
         '-crf', '22',
-        '-pix_fmt', 'yuv420p',
-        '-c:a', 'aac',
-        '-b:a', '192k',
-        '-ac', '2'
-    ])
+        '-pix_fmt', 'yuv420p'
+    ]
 
+    # Insert TikTok bitrate capping inline before audio flags
     if optimize_tiktok == 'yes':
         ffmpeg_cmd.extend(['-maxrate', '12M', '-bufsize', '16M'])
 
-    ffmpeg_cmd.append(output_path)
+    # Audio settings & target file path
+    ffmpeg_cmd.extend([
+        '-c:a', 'aac',
+        '-b:a', '192k',
+        '-ac', '2',
+        output_path
+    ])
 
     try:
         subprocess.run(
@@ -85,14 +84,13 @@ def optimize():
         })
 
     except subprocess.CalledProcessError as e:
-        # Log clean error details if processing fails
-        err_lines = [l for l in e.stderr.split('\n') if 'error' in l.lower() or 'invalid' in l.lower()]
-        clean_err = err_lines[-1] if err_lines else "Stream processing failed."
-
+        # Return full raw stderr so we can pinpoint any remaining flag issues
+        raw_error = e.stderr.strip() if e.stderr else "Unknown FFmpeg error"
+        
         if os.path.exists(input_path):
             os.remove(input_path)
             
-        return jsonify({'success': False, 'error': f"FFmpeg Processing Error: {clean_err}"}), 500
+        return jsonify({'success': False, 'error': f"FFmpeg detail: {raw_error[-300:]}"}), 500
 
     except Exception as e:
         if os.path.exists(input_path):
