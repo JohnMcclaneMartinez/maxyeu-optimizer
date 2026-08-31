@@ -24,6 +24,9 @@ def optimize():
     if file.filename == '':
         return jsonify({'success': False, 'error': 'No selected file'}), 400
 
+    method = request.form.get('method', 'max_quality')
+    optimize_tiktok = request.form.get('optimize_tiktok')
+
     input_path = os.path.join(UPLOAD_FOLDER, file.filename)
     file.save(input_path)
 
@@ -32,20 +35,37 @@ def optimize():
 
     ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
 
-    # Stripped-down baseline command (no complex filter chains)
+    # Configure low-memory resolution limits
+    if method == '720p60':
+        scale_filter = 'scale=trunc(iw/2)*2:720,fps=60'
+    elif method == 'fps_patch':
+        scale_filter = 'fps=60'
+    else:  # max_quality capped at 1080p
+        scale_filter = 'scale=trunc(iw/2)*2:min(1080\,ih)'
+
+    # Memory-safe FFmpeg configuration
     ffmpeg_cmd = [
         ffmpeg_exe, '-y',
+        '-threads', '2',                # Cap threads to prevent RAM spikes
         '-i', input_path,
+        '-vf', scale_filter,
         '-c:v', 'libx264',
-        '-preset', 'ultrafast',
-        '-crf', '23',
-        '-pix_fmt', 'yuv420p',
-        '-c:a', 'aac',
-        output_path
+        '-preset', 'ultrafast',        # Ultrafast uses the least RAM
+        '-crf', '24',                   # Slightly lighter compression
+        '-pix_fmt', 'yuv420p'
     ]
 
+    if optimize_tiktok == 'yes':
+        ffmpeg_cmd.extend(['-maxrate', '8M', '-bufsize', '8M'])
+
+    ffmpeg_cmd.extend([
+        '-c:a', 'aac',
+        '-b:a', '128k',
+        '-ac', '2',
+        output_path
+    ])
+
     try:
-        # Run FFmpeg and capture standard error output
         res = subprocess.run(
             ffmpeg_cmd,
             stdout=subprocess.PIPE,
@@ -54,9 +74,8 @@ def optimize():
         )
 
         if res.returncode != 0:
-            # Print the FULL last 10 lines of stderr to pinpoint the exact failure line
-            err_log = "\n".join(res.stderr.strip().split('\n')[-10:])
-            raise Exception(f"FFmpeg exit code {res.returncode}:\n{err_log}")
+            err_log = "\n".join(res.stderr.strip().split('\n')[-5:])
+            raise Exception(f"FFmpeg error code {res.returncode}: {err_log}")
 
         if os.path.exists(input_path):
             os.remove(input_path)
@@ -69,7 +88,6 @@ def optimize():
     except Exception as e:
         if os.path.exists(input_path):
             os.remove(input_path)
-        # Display the real error directly on the browser JSON page
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/download/<filename>')
