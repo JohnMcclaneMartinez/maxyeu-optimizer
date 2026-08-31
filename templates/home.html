@@ -1,352 +1,441 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>itzCrih - Portfolio & Tools</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MaxyEU - Portfolio & Tools</title>
+  <style>
+    /* Reset & Base Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
 
-        body {
-            background-color: #0b0b0e;
-            color: #ffffff;
-            overflow-x: hidden;
-        }
+    body {
+      background-color: #0b0c10;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
 
-        /* Background Video Overlay */
-        #bg-video {
-            position: fixed;
-            right: 0;
-            bottom: 0;
-            min-width: 100%;
-            min-height: 100%;
-            z-index: -2;
-            object-fit: cover;
-            filter: brightness(0.35) contrast(1.1);
-        }
+    /* Floating / Circling Light Glow Animations */
+    @keyframes pulseGlow {
+      0% {
+        box-shadow: 0 0 10px rgba(168, 85, 247, 0.4), 0 0 20px rgba(192, 132, 252, 0.2);
+        filter: drop-shadow(0 0 6px rgba(168, 85, 247, 0.6));
+      }
+      50% {
+        box-shadow: 0 0 22px rgba(192, 132, 252, 0.8), 0 0 35px rgba(168, 85, 247, 0.5);
+        filter: drop-shadow(0 0 14px rgba(192, 132, 252, 0.9));
+      }
+      100% {
+        box-shadow: 0 0 10px rgba(168, 85, 247, 0.4), 0 0 20px rgba(192, 132, 252, 0.2);
+        filter: drop-shadow(0 0 6px rgba(168, 85, 247, 0.6));
+      }
+    }
 
-        /* Star / Particles Overlay (Optional dark tint) */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(11, 11, 14, 0.6);
-            z-index: -1;
-        }
+    @keyframes rotateBorderGlow {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
 
-        /* Navbar */
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 8%;
-            background: rgba(11, 11, 14, 0.7);
-            backdrop-filter: blur(10px);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
+    /* Color Palette Utility Classes */
+    .text-violet {
+      color: #c084fc;
+      text-shadow: 0 0 12px rgba(192, 132, 252, 0.5);
+    }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #ffb703;
-            text-decoration: none;
-        }
+    .badge-violet {
+      background-color: #c084fc;
+      color: #0b0c10;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      display: inline-block;
+      animation: pulseGlow 3s infinite ease-in-out;
+    }
 
-        .nav-links {
-            display: flex;
-            gap: 20px;
-            list-style: none;
-        }
+    /* Navigation Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 80px;
+      background: rgba(11, 12, 16, 0.8);
+      backdrop-filter: blur(8px);
+    }
 
-        .nav-links a {
-            color: #a0a0ab;
-            text-decoration: none;
-            font-size: 0.95rem;
-            transition: color 0.2s;
-        }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #ffffff;
+      text-decoration: none;
+    }
 
-        .nav-links a:hover {
-            color: #ffffff;
-        }
+    .brand svg {
+      width: 28px;
+      height: 28px;
+      fill: #c084fc;
+      animation: pulseGlow 2.5s infinite ease-in-out;
+    }
 
-        /* Main Container */
-        .container {
-            max-width: 1100px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
+    nav {
+      display: flex;
+      gap: 25px;
+    }
 
-        /* Hero Banner Card */
-        .hero-card {
-            background: rgba(18, 18, 24, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 20px;
-            padding: 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            backdrop-filter: blur(12px);
-            margin-bottom: 40px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-        }
+    nav a {
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: color 0.2s ease;
+    }
 
-        .hero-left {
-            max-width: 600px;
-        }
+    nav a:hover {
+      color: #c084fc;
+    }
 
-        .profile-header {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
+    /* Main Container */
+    main {
+      max-width: 1100px;
+      margin: 40px auto;
+      padding: 0 20px;
+      width: 100%;
+    }
 
-        .avatar {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            border: 2px solid #ffb703;
-            object-fit: cover;
-        }
+    /* Hero Profile Card */
+    .hero-card {
+      position: relative;
+      background-color: #121318;
+      border: 1px solid rgba(168, 85, 247, 0.25);
+      border-radius: 16px;
+      padding: 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      overflow: hidden;
+      margin-bottom: 50px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    }
 
-        .username-title {
-            font-size: 2.2rem;
-            font-weight: 800;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+    /* Circling Light Ring around Avatar */
+    .avatar-wrapper {
+      position: relative;
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      padding: 3px;
+    }
 
-        .username-title span {
-            color: #ffb703;
-        }
+    .avatar-wrapper::before {
+      content: '';
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      background: conic-gradient(from 0deg, transparent 0%, #c084fc 50%, transparent 100%);
+      animation: rotateBorderGlow 4s linear infinite;
+    }
 
-        .bio {
-            color: #a0a0ab;
-            line-height: 1.6;
-            margin-bottom: 20px;
-            font-size: 1rem;
-        }
+    .avatar-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background-color: #1e1f26;
+      object-fit: cover;
+      position: relative;
+      z-index: 1;
+    }
 
-        .bio bold {
-            color: #ffb703;
-        }
+    .profile-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
 
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(34, 197, 94, 0.1);
-            color: #22c55e;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            margin-bottom: 25px;
-            border: 1px solid rgba(34, 197, 94, 0.2);
-        }
+    .profile-name {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background-color: #22c55e;
-            border-radius: 50%;
-        }
+    .profile-name span.lightning {
+      color: #c084fc;
+      animation: pulseGlow 2s infinite ease-in-out;
+    }
 
-        .social-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
+    .profile-bio {
+      color: #94a3b8;
+      max-width: 540px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
 
-        .social-btn {
-            background: rgba(255, 255, 255, 0.05);
-            color: #ffffff;
-            padding: 8px 16px;
-            border-radius: 20px;
-            text-decoration: none;
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.2s;
-        }
+    /* Status indicator */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: #4ade80;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      margin-bottom: 24px;
+    }
 
-        .social-btn:hover {
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateY(-2px);
-        }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      background-color: #4ade80;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #4ade80;
+    }
 
-        .hero-right img {
-            width: 260px;
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
+    /* Social Links */
+    .social-links {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
 
-        /* Projects Section */
-        .section-title {
-            font-size: 1.4rem;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+    .social-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background-color: #1e1f28;
+      color: #e0e0e0;
+      border: 1px solid #2d2f3a;
+      padding: 8px 18px;
+      border-radius: 20px;
+      text-decoration: none;
+      font-size: 0.88rem;
+      transition: all 0.2s ease;
+    }
 
-        .projects-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-        }
+    .social-btn:hover {
+      border-color: #c084fc;
+      color: #c084fc;
+      box-shadow: 0 0 12px rgba(192, 132, 252, 0.3);
+      transform: translateY(-2px);
+    }
 
-        .project-card {
-            background: rgba(18, 18, 24, 0.85);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
-            padding: 24px;
-            backdrop-filter: blur(12px);
-            transition: transform 0.2s, border-color 0.2s;
-        }
+    /* Preview Visual Placeholder */
+    .preview-box {
+      width: 260px;
+      height: 160px;
+      background-color: #1a1b22;
+      border: 1px dashed rgba(192, 132, 252, 0.4);
+      border-radius: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #64748b;
+      font-size: 0.9rem;
+    }
 
-        .project-card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(255, 183, 3, 0.4);
-        }
+    .preview-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 12px;
+    }
 
-        .project-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+    /* Projects Section */
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 1.4rem;
+      margin-bottom: 24px;
+      color: #ffffff;
+    }
 
-        .badge {
-            background: #ffb703;
-            color: #000;
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-weight: 700;
-        }
+    .section-title svg {
+      fill: #c084fc;
+      width: 22px;
+      height: 22px;
+      animation: pulseGlow 3s infinite ease-in-out;
+    }
 
-        .project-desc {
-            color: #a0a0ab;
-            font-size: 0.88rem;
-            line-height: 1.5;
-            margin-bottom: 20px;
-        }
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
 
-        .open-btn {
-            color: #ffb703;
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
+    .project-card {
+      background-color: #121318;
+      border: 1px solid #1e1f28;
+      border-radius: 14px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+    }
 
-        .open-btn:hover {
-            text-decoration: underline;
-        }
-    </style>
+    .project-card:hover {
+      border-color: rgba(192, 132, 252, 0.5);
+      box-shadow: 0 6px 20px rgba(168, 85, 247, 0.15);
+      transform: translateY(-4px);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #ffffff;
+    }
+
+    .card-desc {
+      color: #94a3b8;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .card-action {
+      color: #c084fc;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: gap 0.2s ease;
+    }
+
+    .card-action:hover {
+      gap: 8px;
+      text-shadow: 0 0 10px rgba(192, 132, 252, 0.6);
+    }
+  </style>
 </head>
 <body>
 
-    <!-- Background Video -->
-    <video autoplay loop muted playsinline id="bg-video">
-        <source src="/static/background.mp4" type="video/mp4">
-    </video>
-    <div class="overlay"></div>
-
-    <!-- Navigation -->
+  <!-- Header Navigation -->
+  <header>
+    <a href="/" class="brand">
+      <svg viewBox="0 0 24 24">
+        <path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/>
+      </svg>
+      MaxyEU
+    </a>
     <nav>
-        <a href="/" class="logo"><i class="fa-solid fa-crown"></i> itzCrih</a>
-        <ul class="nav-links">
-            <li><a href="#projects">Projects</a></li>
-            <li><a href="/app">Processor Tool</a></li>
-            <li><a href="#">Quality</a></li>
-            <li><a href="#">Status</a></li>
-        </ul>
+      <a href="#projects">Projects</a>
+      <a href="/app">Processor Tool</a>
+      <a href="#quality">Quality</a>
+      <a href="#status">Status</a>
     </nav>
+  </header>
 
-    <!-- Content -->
-    <div class="container">
-        <!-- Hero Card -->
-        <div class="hero-card">
-            <div class="hero-left">
-                <div class="profile-header">
-                    <img src="/static/avatar.jpg" alt="Avatar" class="avatar">
-                    <div class="username-title">
-                        <i class="fa-solid fa-bolt" style="color:#ffb703;"></i> itzCrih 🇮🇹
-                    </div>
-                </div>
-                <p class="bio">
-                    Creative <b style="color:#ffb703;">Backend Developer</b> & Editor. Building video tools, APIs, and custom encoding workflows to avoid aggressive compression.
-                </p>
-                <div class="status-badge">
-                    <div class="status-dot"></div> All services are online
-                </div>
-                <div class="social-buttons">
-                    <a href="#" class="social-btn"><i class="fa-brands fa-github"></i> GitHub</a>
-                    <a href="#" class="social-btn"><i class="fa-brands fa-youtube"></i> YouTube</a>
-                    <a href="#" class="social-btn"><i class="fa-brands fa-tiktok"></i> TikTok</a>
-                    <a href="#" class="social-btn"><i class="fa-brands fa-spotify"></i> Spotify</a>
-                    <a href="#" class="social-btn"><i class="fa-brands fa-discord"></i> Discord</a>
-                </div>
-            </div>
-            <div class="hero-right">
-                <img src="/static/feature-preview.jpg" alt="Preview Visual">
-            </div>
+  <!-- Main Content Container -->
+  <main>
+    <!-- Profile Card -->
+    <div class="hero-card">
+      <div>
+        <div class="profile-header">
+          <!-- Avatar with Circling Light Ring -->
+          <div class="avatar-wrapper">
+            <img src="{{ url_for('static', filename='avatar.jpg') }}" alt="Avatar" class="avatar-img" onerror="this.src='https://via.placeholder.com/80/121318/c084fc?text=Maxy'">
+          </div>
+          <h1 class="profile-name">
+            <span class="lightning">⚡</span> MaxyEU <span style="font-size: 1.2rem; color: #64748b; font-weight: 400;">IT</span>
+          </h1>
         </div>
 
-        <!-- Projects Grid -->
-        <div class="section-title" id="projects">
-            <i class="fa-solid fa-microchip" style="color:#ffb703;"></i> Projects
-        </div>
-        
-        <div class="projects-grid">
-            <!-- Video Processor Card -->
-            <div class="project-card">
-                <div class="project-title">
-                    itzCrih Method <span class="badge">Tool</span>
-                </div>
-                <p class="project-desc">
-                    TikTok upload method & video optimizer tool to bypass aggressive platform compression.
-                </p>
-                <a href="/app" class="open-btn">Open Processing Tool →</a>
-            </div>
+        <p class="profile-bio">
+          Creative <strong class="text-violet">Backend Developer</strong> & Editor. Building video tools, APIs, and custom encoding workflows to avoid aggressive compression.
+        </p>
 
-            <!-- Other Placeholder Cards -->
-            <div class="project-card">
-                <div class="project-title">itzStream <span class="badge">Public</span></div>
-                <p class="project-desc">Modern lightweight temporary video hosting platform.</p>
-                <a href="#" class="open-btn">Open →</a>
-            </div>
-
-            <div class="project-card">
-                <div class="project-title" style="color:#ffb703;">itzCrih Community</div>
-                <p class="project-desc">Official Discord server for updates and encoding support.</p>
-                <a href="#" class="open-btn">Join →</a>
-            </div>
+        <div class="status-badge">
+          <span class="status-dot"></span> All services are online
         </div>
+
+        <div class="social-links">
+          <a href="#" class="social-btn">⚙️ GitHub</a>
+          <a href="#" class="social-btn">▶ YouTube</a>
+          <a href="#" class="social-btn">🎵 TikTok</a>
+          <a href="#" class="social-btn">🎧 Spotify</a>
+          <a href="#" class="social-btn">💬 Discord</a>
+        </div>
+      </div>
+
+      <!-- Optional Preview Visual -->
+      <div class="preview-box">
+        <img src="{{ url_for('static', filename='feature-preview.jpg') }}" alt="Preview Visual" onerror="this.parentElement.innerHTML='📷 Preview Visual'">
+      </div>
     </div>
+
+    <!-- Projects Section -->
+    <div id="projects">
+      <h2 class="section-title">
+        <svg viewBox="0 0 24 24">
+          <path d="M4 6h16v2H4zm2 4h12v2H6zm-2 4h16v2H4zm2 4h12v2H6z"/>
+        </svg>
+        Projects
+      </h2>
+
+      <div class="projects-grid">
+        <!-- Project 1 -->
+        <div class="project-card">
+          <div>
+            <div class="card-header">
+              <span class="card-title">MaxyEU Method</span>
+              <span class="badge-violet">Tool</span>
+            </div>
+            <p class="card-desc">TikTok upload method & video optimizer tool to bypass aggressive platform compression.</p>
+          </div>
+          <a href="/app" class="card-action">Open Processing Tool →</a>
+        </div>
+
+        <!-- Project 2 -->
+        <div class="project-card">
+          <div>
+            <div class="card-header">
+              <span class="card-title">MaxyStream</span>
+              <span class="badge-violet">Public</span>
+            </div>
+            <p class="card-desc">Modern lightweight temporary video hosting platform.</p>
+          </div>
+          <a href="#" class="card-action">Open →</a>
+        </div>
+
+        <!-- Project 3 -->
+        <div class="project-card">
+          <div>
+            <div class="card-header">
+              <span class="card-title">MaxyEU Community</span>
+            </div>
+            <p class="card-desc">Official Discord server for updates and encoding support.</p>
+          </div>
+          <a href="#" class="card-action">Join →</a>
+        </div>
+      </div>
+    </div>
+  </main>
 
 </body>
 </html>
