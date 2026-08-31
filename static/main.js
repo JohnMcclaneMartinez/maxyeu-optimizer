@@ -7,13 +7,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const optimizerForm = document.getElementById("optimizer-form");
     const submitBtn = document.getElementById("submit-btn");
 
-    const progressBox = document.getElementById("progress-box");
-    const progressStatus = document.getElementById("progress-status");
-    const progressFill = document.getElementById("progress-fill");
-
     const downscaleModal = document.getElementById("downscale-modal");
     const cancelModalBtn = document.getElementById("cancel-modal-btn");
     const localProcessingView = document.getElementById("local-processing-view");
+
+    // UI elements inside local-processing-view
+    const localProgressFill = document.getElementById("local-progress-fill");
+    const localProgressPercent = document.getElementById("local-progress-percent");
+    const localTimeLeft = document.getElementById("local-time-left");
 
     // File Selection via Dropzone
     dropzone.addEventListener("click", () => videoInput.click());
@@ -54,7 +55,6 @@ document.addEventListener("DOMContentLoaded", () => {
             dropzone.style.display = "none";
             filePreview.style.display = "flex";
 
-            // Inspect resolution; show downscaler modal for high-res inputs
             checkVideoResolution(file);
         }
     }
@@ -90,54 +90,60 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Form Submission with Upload Progress Tracking
+    // Handle Form Submission
     optimizerForm.addEventListener("submit", (e) => {
         if (!videoInput.files || videoInput.files.length === 0) {
-            return; // Let standard form validation alert user
+            return;
         }
 
         e.preventDefault();
 
-        // UI transitions to processing state
-        submitBtn.disabled = true;
+        // 1. Hide modal and main form
         downscaleModal.style.display = "none";
-        progressBox.style.display = "block";
+        optimizerForm.style.display = "none";
+
+        // 2. Reveal full loading screen with spinner and progress bar
+        localProcessingView.style.display = "block";
+        localProgressFill.style.width = "0%";
+        localProgressPercent.textContent = "0%";
+        localTimeLeft.textContent = "Uploading to server...";
 
         const formData = new FormData(optimizerForm);
         const xhr = new XMLHttpRequest();
 
+        // 3. Track live upload progress directly inside the loading view
         xhr.upload.addEventListener("progress", (event) => {
             if (event.lengthComputable) {
                 const percentComplete = Math.round((event.loaded / event.total) * 100);
-                progressFill.style.width = percentComplete + "%";
-                progressStatus.textContent = `Uploading Video... ${percentComplete}%`;
+                localProgressFill.style.width = percentComplete + "%";
+                localProgressPercent.textContent = percentComplete + "%";
 
-                if (percentComplete === 100) {
-                    // Show cloud rendering spinner view once upload completes
-                    optimizerForm.style.display = "none";
-                    progressBox.style.display = "none";
-                    localProcessingView.style.display = "block";
+                if (percentComplete < 100) {
+                    localTimeLeft.textContent = `Uploading Video... ${percentComplete}%`;
+                } else {
+                    localTimeLeft.textContent = "Encoding on Cloud Server... Please wait";
                 }
             }
         });
 
         xhr.onload = function () {
             if (xhr.status === 200) {
-                // Replace page content with server response (contains download link)
                 document.open();
                 document.write(xhr.responseText);
                 document.close();
             } else {
                 alert("An error occurred during video processing. Please try again.");
+                localProcessingView.style.display = "none";
+                optimizerForm.style.display = "block";
                 submitBtn.disabled = false;
-                progressBox.style.display = "none";
             }
         };
 
         xhr.onerror = function () {
             alert("Network error occurred during upload.");
+            localProcessingView.style.display = "none";
+            optimizerForm.style.display = "block";
             submitBtn.disabled = false;
-            progressBox.style.display = "none";
         };
 
         xhr.open("POST", optimizerForm.action, true);
