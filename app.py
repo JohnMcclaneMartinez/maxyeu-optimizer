@@ -35,33 +35,50 @@ def optimize():
 
     ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
 
-    # Base FFmpeg command structure
+    # Build video filter chain dynamically
+    vf_filters = []
+    
+    if method == '720p60':
+        vf_filters.append('scale=-2:720')
+        vf_filters.append('fps=60')
+    elif method == 'fps_patch':
+        vf_filters.append('fps=60')
+    else:  # max_quality
+        vf_filters.append('scale=-2:1080')
+
+    # Construct strict FFmpeg command structure
     ffmpeg_cmd = [
         ffmpeg_exe, '-y',
         '-i', input_path,
         '-c:v', 'libx264',
         '-preset', 'fast',
-        '-crf', '22',
-        '-c:a', 'aac',
-        '-b:a', '192k'
+        '-crf', '22'
     ]
 
-    # Add resolution & frame rate filters
-    if method == '720p60':
-        ffmpeg_cmd.extend(['-vf', 'scale=-2:720', '-r', '60'])
-    elif method == 'fps_patch':
-        ffmpeg_cmd.extend(['-r', '60'])
-    else:  # max_quality
-        ffmpeg_cmd.extend(['-vf', 'scale=-2:1080'])
+    # Add video filters if defined
+    if vf_filters:
+        ffmpeg_cmd.extend(['-vf', ','.join(vf_filters)])
 
-    # Add optional bitrate ceiling for TikTok
+    # Handle TikTok bitrate constraints safely
     if optimize_tiktok == 'yes':
         ffmpeg_cmd.extend(['-maxrate', '12M', '-bufsize', '16M'])
 
-    ffmpeg_cmd.append(output_path)
+    # Audio settings & output path
+    ffmpeg_cmd.extend([
+        '-c:a', 'aac',
+        '-b:a', '192k',
+        output_path
+    ])
 
     try:
-        result = subprocess.run(ffmpeg_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, check=True)
+        # Run FFmpeg process
+        process = subprocess.run(
+            ffmpeg_cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            check=True
+        )
         
         if os.path.exists(input_path):
             os.remove(input_path)
@@ -72,14 +89,15 @@ def optimize():
         })
 
     except subprocess.CalledProcessError as e:
-        # Extract the bottom lines of FFmpeg stderr for exact error diagnosis
-        error_lines = e.stderr.strip().split('\n')
-        last_error = " ".join(error_lines[-5:]) if len(error_lines) >= 5 else e.stderr
-        
+        # Extract meaningful error details from stdout/stderr
+        err_msg = e.stderr.strip() if e.stderr else "Unknown encoding error"
+        filtered_lines = [line for line in err_msg.split('\n') if "error" in line.lower() or "invalid" in line.lower()]
+        final_error = filtered_lines[-1] if filtered_lines else err_msg[-200:]
+
         if os.path.exists(input_path):
             os.remove(input_path)
             
-        return jsonify({'success': False, 'error': f"Encoding error: {last_error}"}), 500
+        return jsonify({'success': False, 'error': f"FFmpeg Error: {final_error}"}), 500
 
     except Exception as e:
         if os.path.exists(input_path):
