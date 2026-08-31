@@ -24,16 +24,16 @@
     /* Floating / Circling Light Glow Animations */
     @keyframes pulseGlow {
       0% {
-        box-shadow: 0 0 10px rgba(168, 85, 247, 0.4), 0 0 20px rgba(192, 132, 252, 0.2);
-        filter: drop-shadow(0 0 6px rgba(168, 85, 247, 0.6));
+        text-shadow: 0 0 10px rgba(168, 85, 247, 0.5), 0 0 20px rgba(192, 132, 252, 0.3);
+        filter: drop-shadow(0 0 4px rgba(168, 85, 247, 0.6));
       }
       50% {
-        box-shadow: 0 0 22px rgba(192, 132, 252, 0.8), 0 0 35px rgba(168, 85, 247, 0.5);
-        filter: drop-shadow(0 0 14px rgba(192, 132, 252, 0.9));
+        text-shadow: 0 0 25px rgba(192, 132, 252, 0.9), 0 0 40px rgba(168, 85, 247, 0.7);
+        filter: drop-shadow(0 0 12px rgba(192, 132, 252, 0.9));
       }
       100% {
-        box-shadow: 0 0 10px rgba(168, 85, 247, 0.4), 0 0 20px rgba(192, 132, 252, 0.2);
-        filter: drop-shadow(0 0 6px rgba(168, 85, 247, 0.6));
+        text-shadow: 0 0 10px rgba(168, 85, 247, 0.5), 0 0 20px rgba(192, 132, 252, 0.3);
+        filter: drop-shadow(0 0 4px rgba(168, 85, 247, 0.6));
       }
     }
 
@@ -149,15 +149,11 @@
     .profile-name {
       font-size: 2.2rem;
       font-weight: 800;
-      color: #ffffff;
+      color: #c084fc;
       display: flex;
       align-items: center;
       gap: 8px;
-    }
-
-    .profile-name span.lightning {
-      color: #c084fc;
-      animation: pulseGlow 2s infinite ease-in-out;
+      animation: pulseGlow 2.5s infinite ease-in-out;
     }
 
     .profile-bio {
@@ -291,7 +287,7 @@
             <img src="{{ url_for('static', filename='avatar.jpg') }}" alt="Avatar" class="avatar-img" onerror="this.src='https://via.placeholder.com/80/121318/c084fc?text=Maxy'">
           </div>
           <h1 class="profile-name">
-            <span class="lightning">⚡</span> MaxyEU <span style="font-size: 1.2rem; color: #64748b; font-weight: 400;">IT</span>
+            MaxyEU <span style="font-size: 1.2rem; color: #64748b; font-weight: 400; text-shadow: none; filter: none;">IT</span>
           </h1>
         </div>
 
